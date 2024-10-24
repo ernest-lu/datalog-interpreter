@@ -114,12 +114,11 @@ pub fn run_datalog(program: Program, input: Vec<Fact>) -> Result<Vec<Fact>, Stri
                     }
                 }
             }
-
-            if new_facts.is_empty() {
-                break;
-            }
-            facts_hashset.extend(new_facts.iter().cloned());
         }
+        if new_facts.is_empty() {
+            break;
+        }
+        facts_hashset.extend(new_facts.iter().cloned());
     }
 
     println!("{:?}", facts_hashset);

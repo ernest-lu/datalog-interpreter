@@ -105,9 +105,6 @@ fn parse_declaration_or_fact(
     let mut kind = DeclKind::Input;
 
     while let Some(token) = lexer.next() {
-        if !is_declaration {
-            dbg!(&token);
-        }
         match token {
             Ok(Token::Ident(ident)) => {
                 name = ident;
@@ -155,7 +152,6 @@ fn parse_declaration_or_fact(
             kind: kind,
         }))
     } else {
-        dbg!(&params);
         Ok(Either::Right(Fact {
             name: name,
             params: params,

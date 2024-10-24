@@ -2,7 +2,8 @@ mod implem;
 mod parse;
 use implem::run_datalog;
 use logos::Logos;
-use parse::{parse_fact_vector, parse_program, Token};
+use parse::{parse_fact_vector, parse_program, Fact, Token};
+use std::collections::HashSet;
 // Baseline datalog interpreter for .dl files
 // .dl files are defined by the following grammar:
 // .decl <var_name>(param 1, param 2, param 3) .input / .output
@@ -29,8 +30,5 @@ fn main() {
     let src_input = std::fs::read_to_string(input_filename).expect("Error reading file");
     let facts = parse_fact_vector(&mut Token::lexer(&src_input)).unwrap();
 
-    dbg!(&facts);
-
     let result = run_datalog(program, facts).unwrap();
-    dbg!(result);
 }
