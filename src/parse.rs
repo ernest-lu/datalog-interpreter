@@ -1,3 +1,5 @@
+use either::Either;
+
 use logos::{Lexer, Logos};
 use std::result::Result;
 
@@ -39,12 +41,20 @@ pub enum Token {
 
     #[token(":-")]
     Implies,
+
+    #[regex(r"[0-9]+", |lex| lex.slice().to_owned().parse::<u32>().unwrap())]
+    Number(u32),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum DeclKind {
     Input,
     Output,
+}
+
+pub trait FactLike {
+    fn name(&self) -> &str;
+    fn params(&self) -> &Vec<String>;
 }
 
 #[derive(Debug)]
@@ -52,6 +62,14 @@ pub struct Declaration {
     pub name: String,
     pub params: Vec<String>,
     pub kind: DeclKind,
+}
+impl FactLike for Declaration {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn params(&self) -> &Vec<String> {
+        &self.params
+    }
 }
 
 fn parse_params(lexer: &mut Lexer<'_, Token>) -> Result<Vec<String>, String> {
@@ -76,17 +94,20 @@ fn parse_params(lexer: &mut Lexer<'_, Token>) -> Result<Vec<String>, String> {
 }
 
 // Parse a declaration with or without an the input flag.
-fn parse_declaration(
+fn parse_declaration_or_fact(
     lexer: &mut Lexer<'_, Token>,
     with_input: bool,
-) -> Result<Declaration, String> {
+    is_declaration: bool,
+) -> Result<Either<Declaration, Fact>, String> {
     // .decl <ident>(<params>) .<input/output>
     let mut name = String::new();
     let mut params = vec![];
     let mut kind = DeclKind::Input;
-    dbg!(&with_input);
+
     while let Some(token) = lexer.next() {
-        dbg!(&token);
+        if !is_declaration {
+            dbg!(&token);
+        }
         match token {
             Ok(Token::Ident(ident)) => {
                 name = ident;
@@ -127,11 +148,19 @@ fn parse_declaration(
         }
     }
 
-    Ok(Declaration {
-        name: name,
-        params: params,
-        kind: kind,
-    })
+    if is_declaration {
+        Ok(Either::Left(Declaration {
+            name: name,
+            params: params,
+            kind: kind,
+        }))
+    } else {
+        dbg!(&params);
+        Ok(Either::Right(Fact {
+            name: name,
+            params: params,
+        }))
+    }
 }
 
 #[derive(Debug)]
@@ -141,8 +170,25 @@ pub struct Rule {
 }
 
 fn parse_rule(lexer: &mut Lexer<'_, Token>) -> Result<Rule, String> {
-    let head = parse_declaration(lexer, false)?;
+    let head = parse_declaration_or_fact(lexer, false, true)?
+        .left()
+        .unwrap();
     let mut body = vec![];
+
+    let num_decl = match lexer.next() {
+        Some(Ok(Token::Number(u))) => u,
+        _ => {
+            return Err("Expected a number".to_string());
+        }
+    };
+
+    for _ in 0..num_decl {
+        body.push(
+            parse_declaration_or_fact(lexer, false, true)?
+                .left()
+                .unwrap(),
+        );
+    }
 
     Ok(Rule { head, body })
 }
@@ -159,7 +205,11 @@ pub fn parse_program(lexer: &mut Lexer<'_, Token>) -> Result<Program, String> {
     while let Some(token) = lexer.next() {
         match token {
             Ok(Token::DeclHeader) => {
-                decls.push(parse_declaration(lexer, true)?);
+                decls.push(
+                    parse_declaration_or_fact(lexer, true, true)?
+                        .left()
+                        .unwrap(),
+                );
             }
             Ok(Token::RuleHeader) => {
                 rules.push(parse_rule(lexer)?);
@@ -171,4 +221,39 @@ pub fn parse_program(lexer: &mut Lexer<'_, Token>) -> Result<Program, String> {
     }
 
     Ok(Program { decls, rules })
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub struct Fact {
+    pub name: String,
+    pub params: Vec<String>,
+}
+impl FactLike for Fact {
+    fn name(&self) -> &str {
+        &self.name
+    }
+    fn params(&self) -> &Vec<String> {
+        &self.params
+    }
+}
+
+pub fn parse_fact_vector(lexer: &mut Lexer<'_, Token>) -> Result<Vec<Fact>, String> {
+    let mut facts = vec![];
+
+    let num_facts = match lexer.next() {
+        Some(Ok(Token::Number(num))) => num,
+        _ => {
+            return Err("Expected a number".to_string());
+        }
+    };
+
+    for _ in 0..num_facts {
+        facts.push(
+            parse_declaration_or_fact(lexer, false, false)?
+                .right()
+                .unwrap(),
+        );
+    }
+
+    Ok(facts)
 }

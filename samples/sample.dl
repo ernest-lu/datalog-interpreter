@@ -1,4 +1,4 @@
 .decl edge(x, y) .input;
 .decl reachable(x, y) .output;
-.rule reachable(x, y) :- edge(x, y);
-.rule reachable(x, z) :- reachable(x, y), edge(y, z); 
+.rule reachable(x, y) :- 1 edge(x, y);
+.rule reachable(x, z) :- 2 reachable(x, y), edge(y, z); 
