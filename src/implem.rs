@@ -52,7 +52,6 @@ pub fn run_datalog(program: Program, input: Vec<Fact>) -> Result<Vec<Fact>, Stri
     let mut facts_hashset: HashSet<Fact> = HashSet::from_iter(input.iter().cloned());
 
     println!("{:?}", facts_hashset);
-    dbg!("STARTING DATALOG LOOP");
 
     loop {
         // loop until convergence
