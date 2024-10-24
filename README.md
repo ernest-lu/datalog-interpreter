@@ -2,8 +2,6 @@
 
 A small datalog interpreter written in Rust. Can interpret .dl programs and run them on a set of input factr. Implemented by a naive expansion of rules until convergence.
 
-## Features
-
 
 ## Example
 
