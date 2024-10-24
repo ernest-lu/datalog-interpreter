@@ -1,5 +1,5 @@
 [package]
-name = "datalog-ptr"
+name = "datalogint"
 version = "0.1.0"
 edition = "2021"
 
