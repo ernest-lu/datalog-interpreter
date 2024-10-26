@@ -5,6 +5,10 @@ A small datalog interpreter written in Rust. Can interpret .dl programs and run 
 
 ## Example
 
+```
+Example usage: cargo run --release samples/sample.dl samples/sample.in
+```
+
 
 Datalog program:
 ```datalog
