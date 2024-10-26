@@ -51,14 +51,11 @@ pub fn run_datalog(program: Program, input: Vec<Fact>) -> Result<Vec<Fact>, Stri
 
     let mut facts_hashset: HashSet<Fact> = HashSet::from_iter(input.iter().cloned());
 
-    println!("{:?}", facts_hashset);
-
     loop {
         // loop until convergence
         let mut new_facts = vec![];
         for rule in &program.rules {
             let num_body_facts = rule.body.len();
-
             let expected_parameter_locations = get_parameter_locations(&rule.body);
 
             // iterate over all permutations of the body facts

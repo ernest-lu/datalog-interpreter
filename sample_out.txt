@@ -1,0 +1,4 @@
+{Fact { name: "edge", params: ["x", "y"] }, Fact { name: "edge", params: ["y", "z"] }, Fact { name: "reachable", params: ["x", "z"] }, Fact { name: "reachable", params: ["x", "y"] }, Fact { name: "reachable", params: ["y", "z"] }}
+Fact { name: "reachable", params: ["x", "z"] }
+Fact { name: "reachable", params: ["x", "y"] }
+Fact { name: "reachable", params: ["y", "z"] }
