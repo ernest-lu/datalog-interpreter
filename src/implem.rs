@@ -31,9 +31,10 @@ fn verify_facts(program: &Program, facts: &Vec<Fact>) -> Result<(), String> {
     Ok(())
 }
 
-fn get_parameter_locations<T: FactLike>(
-    facts: &Vec<T>,
-) -> HashMap<String, HashSet<(usize, usize)>> {
+fn get_parameter_locations<T>(facts: &Vec<T>) -> HashMap<String, HashSet<(usize, usize)>>
+where
+    T: FactLike,
+{
     let mut parameter_locations = HashMap::new();
     for (i, fact) in facts.iter().enumerate() {
         for (j, param) in fact.params().iter().enumerate() {
@@ -65,23 +66,16 @@ pub fn run_datalog(program: Program, input: Vec<Fact>) -> Result<Vec<Fact>, Stri
             let num_body_facts = rule.body.len();
             let expected_parameter_locations = get_parameter_locations(&rule.body);
 
-            // iterate over all permutations of the body facts
-            let facts_vec = facts_hashset.clone().into_iter().collect::<Vec<_>>();
-
             for size_new_frontier in 1..=num_body_facts {
                 // iterate at least one new fact from the previous frontier for semi-naive evaluation
                 let size_old_frontier = num_body_facts - size_new_frontier;
-                for subset_new in previous_frontier
-                    .clone()
-                    .into_iter()
-                    .combinations(size_new_frontier)
-                {
-                    for subset_old in old_frontier
-                        .clone()
-                        .into_iter()
-                        .combinations(size_old_frontier)
-                    {
-                        let combined_subset = [subset_new.clone(), subset_old.clone()].concat();
+                for subset_new in previous_frontier.iter().combinations(size_new_frontier) {
+                    for subset_old in old_frontier.iter().combinations(size_old_frontier) {
+                        let combined_subset: Vec<Fact> = [
+                            subset_new.iter().map(|f| (*f).clone()).collect::<Vec<_>>(),
+                            subset_old.iter().map(|f| (*f).clone()).collect::<Vec<_>>(),
+                        ]
+                        .concat();
                         for subset in combined_subset.into_iter().permutations(num_body_facts) {
                             // Check if each fact name matches the corresponding body declaration
                             let matches = subset.iter().zip(&rule.body).all(|(fact, decl)| {
