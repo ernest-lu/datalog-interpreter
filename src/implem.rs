@@ -1,6 +1,6 @@
-use crate::parse::{DeclKind, Fact, FactLike, Program};
+use crate::parse::{DeclKind, Declaration, Fact, FactLike, Program};
 use itertools::Itertools;
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 //  Verify that the facts are valid according to the program
 //  Facts have correct number of arguments
@@ -47,8 +47,175 @@ where
     parameter_locations
 }
 
+// a fact is characterized by a mapping from relation name to a set of parameters
+// A table is a list of facts with the same relation name
+// when we run datalog, we are "joining" the tables in the rules on a specified set of keys
+struct Table {
+    name: String,
+    facts: Vec<Fact>,
+}
+
+// a mapping of parameter names to parameter names, to be hash joined with a table
+#[derive(Clone, Debug)]
+struct ParameterMapping {
+    // the parameter mappings that are being joined on
+    // we use a BTreeMap to because it can be hashed
+    parameter_maps: HashSet<BTreeMap<String, String>>,
+    // the parameter names that are being joined on
+    parameter_keys: HashSet<String>,
+}
+
+impl ParameterMapping {
+    fn is_empty(&self) -> bool {
+        self.parameter_keys.is_empty()
+    }
+    fn new() -> ParameterMapping {
+        ParameterMapping {
+            parameter_maps: HashSet::new(),
+            parameter_keys: HashSet::new(),
+        }
+    }
+}
+
+fn join_parameter_mapping(a: ParameterMapping, b: ParameterMapping) -> ParameterMapping {
+    let intsct_keys = a
+        .parameter_keys
+        .intersection(&b.parameter_keys)
+        .collect::<Vec<_>>();
+
+    if intsct_keys.is_empty() {
+        return ParameterMapping::new();
+    }
+
+    let mut a_hashmap = HashMap::new();
+    for pm in a.parameter_maps {
+        let hash = intsct_keys
+            .iter()
+            .map(|k| pm.get(*k).unwrap().clone())
+            .collect::<Vec<_>>();
+        a_hashmap.entry(hash).or_insert(vec![]).push(pm);
+    }
+
+    let mut b_hashmap = HashMap::new();
+    for pm in b.parameter_maps {
+        let hash = intsct_keys
+            .iter()
+            .map(|k| pm.get(*k).unwrap().clone())
+            .collect::<Vec<_>>();
+        b_hashmap.entry(hash).or_insert(vec![]).push(pm);
+    }
+
+    let mut new_parameter_mapping = ParameterMapping::new();
+    for (k, a_v) in a_hashmap {
+        if let Some(b_v) = b_hashmap.get(&k) {
+            for a_pm in a_v {
+                for b_pm in b_v {
+                    let mut new_pm = a_pm.clone();
+                    new_pm.extend(b_pm.iter().map(|(k, v)| (k.clone(), v.clone())));
+                    new_parameter_mapping.parameter_maps.insert(new_pm);
+                }
+            }
+        }
+    }
+
+    new_parameter_mapping.parameter_keys = a
+        .parameter_keys
+        .union(&b.parameter_keys)
+        .map(|k| k.clone())
+        .collect::<HashSet<_>>();
+    new_parameter_mapping
+}
+
+#[test]
+fn test_join_parameter_mapping() {
+    let a = ParameterMapping {
+        parameter_maps: HashSet::from([
+            BTreeMap::from([
+                ("a_key".to_string(), "a_value".to_string()),
+                ("b_key".to_string(), "b_value".to_string()),
+                ("c_key".to_string(), "c_value".to_string()),
+            ]),
+            BTreeMap::from([
+                ("a_key".to_string(), "a_value2".to_string()),
+                ("b_key".to_string(), "b_value2".to_string()),
+                ("c_key".to_string(), "c_value2".to_string()),
+            ]),
+        ]),
+        parameter_keys: HashSet::from([
+            "a_key".to_string(),
+            "b_key".to_string(),
+            "c_key".to_string(),
+        ]),
+    };
+    let b = ParameterMapping {
+        parameter_maps: HashSet::from([
+            BTreeMap::from([
+                ("a_key".to_string(), "a_value".to_string()),
+                ("b_key".to_string(), "b_value".to_string()),
+                ("d_key".to_string(), "d_value".to_string()),
+            ]),
+            BTreeMap::from([
+                ("a_key".to_string(), "a_value2".to_string()),
+                ("b_key".to_string(), "b_value2".to_string()),
+                ("d_key".to_string(), "d_value2".to_string()),
+            ]),
+        ]),
+        parameter_keys: HashSet::from([
+            "a_key".to_string(),
+            "b_key".to_string(),
+            "d_key".to_string(),
+        ]),
+    };
+    let c = join_parameter_mapping(a, b);
+    dbg!(&c);
+
+    assert_eq!(c.parameter_maps.len(), 2);
+    assert_eq!(c.parameter_keys.len(), 4);
+    assert!(c.parameter_maps.contains(&BTreeMap::from([
+        ("a_key".to_string(), "a_value".to_string()),
+        ("b_key".to_string(), "b_value".to_string()),
+        ("c_key".to_string(), "c_value".to_string()),
+        ("d_key".to_string(), "d_value".to_string()),
+    ])));
+
+    assert!(c.parameter_maps.contains(&BTreeMap::from([
+        ("a_key".to_string(), "a_value2".to_string()),
+        ("b_key".to_string(), "b_value2".to_string()),
+        ("c_key".to_string(), "c_value2".to_string()),
+        ("d_key".to_string(), "d_value2".to_string()),
+    ])));
+}
+
+struct Database {
+    tables: HashMap<String, Table>,
+}
+
+fn construct_database(facts: &Vec<Fact>) -> Database {
+    let mut tables = HashMap::new();
+    for fact in facts {
+        tables
+            .entry(fact.name.clone())
+            .or_insert(Table {
+                name: fact.name.clone(),
+                facts: vec![],
+            })
+            .facts
+            .push(fact.clone());
+    }
+    Database { tables }
+}
+
 pub fn run_datalog(program: Program, input: Vec<Fact>) -> Result<Vec<Fact>, String> {
     verify_facts(&program, &input)?;
+
+    // the new frontier consists of facts just recently added
+    let new_frontier = construct_database(&input);
+    // the old frontier consists of facts that have already been added
+    let old_frontier = Database {
+        tables: HashMap::new(),
+    };
+
+    // semi-naive evaluation runs new X old, new X new, and old X new to join facts together
 
     let mut facts_hashset: HashSet<Fact> = HashSet::from_iter(input.iter().cloned());
 
@@ -63,8 +230,11 @@ pub fn run_datalog(program: Program, input: Vec<Fact>) -> Result<Vec<Fact>, Stri
         // loop until convergence
         let mut new_facts = vec![];
         for rule in &program.rules {
+            // compute this using a join
+            // join(R, S)
             let num_body_facts = rule.body.len();
-            let expected_parameter_locations = get_parameter_locations(&rule.body);
+            let expected_parameter_locations: HashMap<String, HashSet<(usize, usize)>> =
+                get_parameter_locations(&rule.body);
 
             for size_new_frontier in 1..=num_body_facts {
                 // iterate at least one new fact from the previous frontier for semi-naive evaluation

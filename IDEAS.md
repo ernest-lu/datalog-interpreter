@@ -20,3 +20,6 @@
  - Datalog for input generation
     - Variables and bounds
 - Datalog to search state spaces?
+
+- Working on pytorch
+- Pytorch relations to compiler optimizations
