@@ -23,3 +23,8 @@
 
 - Working on pytorch
 - Pytorch relations to compiler optimizations
+
+
+- Buildit implements multi-stage compiling
+
+- Interested in opportunities in hedge funds and quant finance and C++ roles
