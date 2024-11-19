@@ -1,6 +1,7 @@
 use either::Either;
 
 use logos::{Lexer, Logos};
+use std::fmt;
 use std::result::Result;
 
 #[derive(Logos, Debug)]
@@ -224,6 +225,13 @@ pub struct Fact {
     pub name: String,
     pub params: Vec<String>,
 }
+
+impl fmt::Display for Fact {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}({})", self.name, self.params.join(", "))
+    }
+}
+
 impl FactLike for Fact {
     fn name(&self) -> &str {
         &self.name

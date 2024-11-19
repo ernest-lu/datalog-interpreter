@@ -1,0 +1,5 @@
+4
+edge(a, b);
+edge(b, c);
+edge(x, y);
+edge(y, z);

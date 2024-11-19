@@ -1,0 +1,5 @@
+4
+edge(start, mid);
+edge(mid, branch1);
+edge(mid, branch2);
+edge(branch1, end);

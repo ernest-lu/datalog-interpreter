@@ -1,0 +1,5 @@
+4
+edge(center, n1);
+edge(center, n2);
+edge(center, n3);
+edge(center, n4);

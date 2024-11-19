@@ -1,0 +1,7 @@
+6
+edge(a, b);
+edge(b, c);
+edge(c, d);
+edge(e, f);
+edge(f, g);
+edge(g, h);

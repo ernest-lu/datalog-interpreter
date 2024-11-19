@@ -169,12 +169,11 @@ fn get_output_fact(rule: &Rule, parameter_mapping: &ParameterMapping) -> Vec<Fac
 pub fn run_datalog(program: Program, input: Vec<Fact>) -> Result<Vec<Fact>, String> {
     verify_facts(&program, &input)?;
 
+    // the new frontier consists of facts just recently added
     let mut frontier = Database {
         tables: HashMap::new(),
     };
     extend_database(&mut frontier, &input);
-    // the new frontier consists of facts just recently added
-
     // semi-naive evaluation runs new X old, new X new, and old X new to join facts together
     let mut facts_hashset: HashSet<Fact> = HashSet::from_iter(input.iter().cloned());
 

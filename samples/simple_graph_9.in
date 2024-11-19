@@ -1,0 +1,13 @@
+12
+edge(a, b);
+edge(b, c);
+edge(c, d);
+edge(d, a);
+edge(b, e);
+edge(e, f);
+edge(f, c);
+edge(d, g);
+edge(g, h);
+edge(h, e);
+edge(f, h);
+edge(g, a);

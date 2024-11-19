@@ -1,0 +1,9 @@
+8
+edge(a, b);
+edge(b, c);
+edge(c, d);
+edge(d, e);
+edge(b, f);
+edge(c, g);
+edge(d, h);
+edge(h, e);

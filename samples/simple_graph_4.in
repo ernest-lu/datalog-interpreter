@@ -1,0 +1,4 @@
+3
+edge(root, left);
+edge(root, right);
+edge(left, leaf);

@@ -3,6 +3,12 @@ name = "datalogint"
 version = "0.1.0"
 edition = "2021"
 
+[workspace]
+members = [
+    ".",
+    "web-demo"
+]
+
 [dependencies]
 logos = "0.13.0"
 either = "1.9.0"
