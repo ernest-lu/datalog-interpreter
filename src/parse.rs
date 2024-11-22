@@ -5,7 +5,8 @@ use std::fmt;
 use std::result::Result;
 
 #[derive(Logos, Debug)]
-#[logos(skip r"[ \t\r\n\f]+")]
+#[logos(skip r"[ \t\r\n\f]+")] // skip whitespace
+#[logos(skip r"#[^\n\r]*")] // skip comments
 pub enum Token {
     #[token(".decl")]
     DeclHeader,

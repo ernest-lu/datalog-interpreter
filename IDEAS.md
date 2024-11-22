@@ -27,4 +27,25 @@
 
 - Buildit implements multi-stage compiling
 
-- Interested in opportunities in hedge funds and quant finance and C++ roles
+- Plan for liveness analysis
+    - Implement a node at each instruction point
+        - Includes which variables are live at each instruction point
+        - Includes successor relations (input)
+        - Use var and definitions all here
+        - Naming scheme: 
+            - Independently handle functions
+                - block_name.line_name
+
+- Understanding of negation
+    - Needs to be stratified negation
+        - Meaning negation cannot be in heads
+        - Negation cannot form cycles
+    -  Don't necessarily need to implement negation for this datalog
+
+- Understanding of join optimization
+    - Want to order joins in such a way that keys line up with each other
+    - If two tables share a key, it is better to join them together first. Want to avoid implementing a cartesian product
+
+- Understanding of hydroflow:
+    - Dataflow analysis framework for general data processing.
+    - Not necesserily a compiler. Compiler dataflow runs on the control flow graph as opposed to data flow graph.

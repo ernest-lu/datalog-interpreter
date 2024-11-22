@@ -1,5 +1,4 @@
 use crate::parse::{DeclKind, Declaration, Fact, FactLike, Program, Rule};
-use itertools::Itertools;
 use std::collections::{BTreeMap, HashMap, HashSet};
 
 //  Verify that the facts are valid according to the program
@@ -166,8 +165,8 @@ fn get_output_fact(rule: &Rule, parameter_mapping: &ParameterMapping) -> Vec<Fac
     facts.into_iter().collect()
 }
 
-pub fn run_datalog(program: Program, input: Vec<Fact>) -> Result<Vec<Fact>, String> {
-    verify_facts(&program, &input)?;
+pub fn run_datalog(program: &Program, input: Vec<Fact>) -> Result<Vec<Fact>, String> {
+    verify_facts(program, &input)?;
 
     // the new frontier consists of facts just recently added
     let mut frontier = Database {

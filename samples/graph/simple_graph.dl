@@ -1,3 +1,5 @@
+# edges and reachability queries
+
 .decl edge(x, y) .input;
 .decl reachable(x, y) .output;
 .rule reachable(x, y) :- 1 edge(x, y);

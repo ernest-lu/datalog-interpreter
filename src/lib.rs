@@ -1,5 +1,7 @@
-pub mod parse;
 pub mod implem;
+pub mod parse;
+pub mod parse_bril;
 
 pub use implem::run_datalog;
-pub use parse::{Program, Fact, Token};
+pub use parse::{Fact, Program, Token};
+pub use parse_bril::parse_bril;

@@ -61,7 +61,7 @@ pub fn run_datalog_analysis(input: &str) -> String {
             };
 
             // Run the analysis
-            match run_datalog(program, facts) {
+            match run_datalog(&program, facts) {
                 Ok(result) => {
                     let output = result
                         .iter()

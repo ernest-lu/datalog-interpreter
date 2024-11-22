@@ -1,0 +1,26 @@
+# for every node: define:
+# edges between nodes
+# undefined variable
+# variable being used
+
+# edge between two control flow basic blocks
+.decl successor(x, y) .input;
+
+# variable is undefined at this basic block
+.decl undefined(x, v) .input;
+
+# variable is used at this basic block
+.decl var_used(x, v) .input;
+
+# variable is live at this basic block
+.decl var_live(x, v) .output;
+
+# we define liveness to occur after the instruction
+# rules to define liveness, liveness of successors
+.rule var_live(x, v) :- 3 successor(x, y), var_live(y, v), undefined(y, v);
+.rule var_live(x, v) :- 3 successor(x, y), var_used(y, v), undefined(y, v);
+
+# x = 3
+# y = 4
+# x = x + y
+
