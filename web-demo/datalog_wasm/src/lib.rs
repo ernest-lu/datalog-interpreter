@@ -1,12 +1,9 @@
-use datalogint::bril_rs::{load_program_from_read, BBProgram};
+use datalogint::bril_rs::BBProgram;
 use datalogint::implem::run_datalog;
 use datalogint::optimize_bril::perform_liveness_analysis;
-use datalogint::parse::{parse_fact_vector, DeclKind, Declaration, Program, Rule, Token};
+use datalogint::parse::{parse_fact_vector, parse_program, Token};
 use datalogint::parse_bril::{bril_to_string, parse_bril};
 use logos::Logos;
-use std::collections::{HashMap, HashSet};
-use std::io::Write;
-use std::process::{Command, Stdio};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -22,78 +19,33 @@ pub fn analyze_bril_program(bril_src: &str) -> Result<String, JsError> {
 }
 
 #[wasm_bindgen]
-pub fn run_datalog_analysis(input: &str) -> String {
-    // Parse input using the existing parser
-    let mut lexer = Token::lexer(input);
-    match parse_fact_vector(&mut lexer) {
-        Ok(facts) => {
-            // Create a simple program that defines edge and path relations
-            let program = Program {
-                decls: vec![
-                    Declaration {
-                        name: "edge".to_string(),
-                        params: vec!["x".to_string(), "y".to_string()],
-                        kind: DeclKind::Input,
-                    },
-                    Declaration {
-                        name: "path".to_string(),
-                        params: vec!["x".to_string(), "y".to_string()],
-                        kind: DeclKind::Output,
-                    },
-                ],
-                rules: vec![
-                    // Base case: edge(x,y) -> path(x,y)
-                    Rule {
-                        head: Declaration {
-                            name: "path".to_string(),
-                            params: vec!["x".to_string(), "y".to_string()],
-                            kind: DeclKind::Output,
-                        },
-                        body: vec![Declaration {
-                            name: "edge".to_string(),
-                            params: vec!["x".to_string(), "y".to_string()],
-                            kind: DeclKind::Input,
-                        }],
-                    },
-                    // Transitive case: path(x,y) ∧ edge(y,z) -> path(x,z)
-                    Rule {
-                        head: Declaration {
-                            name: "path".to_string(),
-                            params: vec!["x".to_string(), "z".to_string()],
-                            kind: DeclKind::Output,
-                        },
-                        body: vec![
-                            Declaration {
-                                name: "path".to_string(),
-                                params: vec!["x".to_string(), "y".to_string()],
-                                kind: DeclKind::Output,
-                            },
-                            Declaration {
-                                name: "edge".to_string(),
-                                params: vec!["y".to_string(), "z".to_string()],
-                                kind: DeclKind::Input,
-                            },
-                        ],
-                    },
-                ],
-            };
+pub fn run_datalog_analysis(rules: &str, facts: &str) -> Result<String, JsError> {
+    // Parse program (rules)
+    let mut rules_lexer = Token::lexer(rules);
+    let program = match parse_program(&mut rules_lexer) {
+        Ok(program) => program,
+        Err(e) => return Err(JsError::new(&format!("Error parsing rules: {}", e))),
+    };
 
-            // Run the analysis
-            match run_datalog(&program, facts) {
-                Ok(result) => {
-                    let output = result
-                        .iter()
-                        .filter(|f| f.name == "path")
-                        .fold("".to_string(), |acc, f| {
-                            acc.to_owned() + &format!("{}\n", f)
-                        });
-                    format!("{}", output)
-                }
-                Err(e) => format!("Analysis error: {}", e),
-            }
-        }
-        Err(e) => format!("Parse error: {}", e),
-    }
+    // Parse facts
+    let mut facts_lexer = Token::lexer(facts);
+    let facts = match parse_fact_vector(&mut facts_lexer) {
+        Ok(facts) => facts,
+        Err(e) => return Err(JsError::new(&format!("Error parsing facts: {}", e))),
+    };
+
+    // Run the analysis
+    let output_facts = match run_datalog(&program, facts) {
+        Ok(output_facts) => output_facts,
+        Err(e) => return Err(JsError::new(&format!("Error running analysis: {}", e))),
+    };
+
+    // Format the output facts as a string
+    let result = output_facts.iter().fold(String::new(), |acc, fact| {
+        format!("{}{}: {}\n", acc, fact.name, fact.params.join(", "))
+    });
+
+    Ok(result)
 }
 
 #[wasm_bindgen(start)]

@@ -1,123 +1,397 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datalog PTR Analysis</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.js"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        }
-        .container {
-            display: flex;
-            gap: 20px;
-            height: calc(100vh - 40px);
-        }
-        .editor-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .editor {
-            flex: 1;
-            border: 1px solid #ccc;
-        }
-        .output {
-            flex: 1;
-            border: 1px solid #ccc;
-            padding: 10px;
-            overflow: auto;
-            white-space: pre-wrap;
-            font-family: monospace;
-            background-color: #f5f5f5;
-        }
-        .button-container {
-            margin: 10px 0;
-        }
-        button {
-            padding: 8px 16px;
-            font-size: 14px;
-            cursor: pointer;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        h2 {
-            margin: 0 0 10px 0;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Datalog Analysis Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    textarea,
+    .editor {
+      width: 100%;
+      min-height: 300px;
+      font-family: monospace;
+      margin-bottom: 10px;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    pre {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.js"></script>
 </head>
+
 <body>
-    <div class="container">
-        <div class="editor-container">
-            <h2>Bril Input</h2>
-            <div id="editor" class="editor"></div>
-            <div class="button-container">
-                <button onclick="analyzeBril()">Analyze</button>
-            </div>
-        </div>
-        <div class="editor-container">
-            <h2>Analysis Output</h2>
-            <div id="output" class="output"></div>
-        </div>
+  <h1>Datalog Analysis Demo</h1>
+
+  <select id="analysisType" onchange="updateAnalysis()">
+    <optgroup label="Bril Program Analysis">
+      <option value="factorial">Factorial (Recursive)</option>
+      <option value="fibonacci">Fibonacci (Iterative)</option>
+      <option value="nested_loops">Nested Loops</option>
+      <option value="variable_reuse">Variable Reuse</option>
+      <option value="multi_func">Multiple Functions</option>
+      <option value="ackerman">Ackerman Function</option>
+      <option value="small">Small Example</option>
+    </optgroup>
+    <optgroup label="General Datalog">
+      <option value="ancestry">Family Relationships</option>
+      <option value="graph">Graph Reachability</option>
+      <option value="company">Company Hierarchy</option>
+      <option value="social">Social Network</option>
+    </optgroup>
+  </select>
+
+  <div class="container">
+    <div>
+      <h2 id="program-type">Datalog Rules</h2>
+      <div id="editor" class="editor"></div>
     </div>
+    <div>
+      <h2 id="facts-type">Input Facts</h2>
+      <div id="facts" class="editor"></div>
+    </div>
+    <div>
+      <h2>Analysis Results</h2>
+      <div id="output" class="editor"></div>
+    </div>
+  </div>
 
-    <script>
-        let editor;
-        const defaultCode = `@main {
-  a: int = const 1;
-  b: int = const 2;
-  sum: int = add a b;
-  print sum;
-}`;
+  <button onclick="runAnalysis()">Run Analysis</button>
 
-        // Initialize Monaco Editor
-        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' }});
-        require(['vs/editor/editor.main'], function() {
-            editor = monaco.editor.create(document.getElementById('editor'), {
-                value: defaultCode,
-                language: 'plaintext',
-                theme: 'vs-light',
-                minimap: { enabled: false },
-                automaticLayout: true
-            });
-        });
+  <script type="module">
+    import init, { run_datalog_analysis, analyze_bril_program } from './datalog_wasm.js';
 
-        // Initialize WebAssembly module
-        let wasm;
-        async function init() {
-            try {
-                wasm = await import('./datalog_wasm.js');
-                await wasm.default();
-                console.log('WASM module initialized');
-            } catch (e) {
-                console.error('Failed to initialize WASM:', e);
-                document.getElementById('output').textContent = 'Error: Failed to initialize WASM module';
-            }
+    const analyses = {
+      // Bril Program Analysis Examples
+      factorial: {
+        code: `# Recursive factorial function
+@main(n: int) {
+  result: int = call @factorial n;
+}
+
+@factorial(n: int): int {
+  zero: int = const 0;
+  one: int = const 1;
+  is_zero: bool = eq n zero;
+  br is_zero .base .rec;
+.base:
+  ret one;
+.rec:
+  n_minus_one: int = sub n one;
+  rec_result: int = call @factorial n_minus_one;
+  result: int = mul n rec_result;
+  ret result;
+}`
+      },
+      fibonacci: {
+        code: `# Iterative fibonacci calculation
+@main(n: int) {
+  zero: int = const 0;
+  one: int = const 1;
+  i: int = const 2;
+  prev2: int = const 0;
+  prev1: int = const 1;
+.loop_header:
+  cond: bool = le i n;
+  br cond .body .done;
+.body:
+  sum: int = add prev1 prev2;
+  prev2: id prev1;
+  prev1: id sum;
+  i: int = add i one;
+  jmp .loop_header;
+.done:
+  ret prev1;
+}`
+      },
+      nested_loops: {
+        code: `# Nested loops example
+@main(n: int) {
+  zero: int = const 0;
+  one: int = const 1;
+  i: int = const 0;
+.outer_loop:
+  cond1: bool = lt i n;
+  br cond1 .outer_body .done;
+.outer_body:
+  j: int = const 0;
+.inner_loop:
+  cond2: bool = lt j n;
+  br cond2 .inner_body .outer_next;
+.inner_body:
+  sum: int = add i j;
+  j: int = add j one;
+  jmp .inner_loop;
+.outer_next:
+  i: int = add i one;
+  jmp .outer_loop;
+.done:
+  ret i;
+}`
+      },
+      variable_reuse: {
+        code: `# Variable reuse and shadowing
+@main(n: int) {
+  x: int = const 1;
+  y: int = const 2;
+  z: int = add x y;
+  {
+    x: int = const 3;
+    y: int = const 4;
+    z: int = add x y;
+  }
+  result: int = add x z;
+  ret result;
+}`
+      },
+      multi_func: {
+        code: `# Multiple function calls
+@main(n: int) {
+  result1: int = call @double n;
+  result2: int = call @triple n;
+  final: int = add result1 result2;
+  ret final;
+}
+
+@double(x: int): int {
+  two: int = const 2;
+  result: int = mul x two;
+  ret result;
+}
+
+@triple(x: int): int {
+  three: int = const 3;
+  result: int = mul x three;
+  ret result;
+}`
+      },
+      ackerman: {
+        code: `# Ackerman function
+@main(m: int, n: int) {
+  result: int = call @ack m n;
+  ret result;
+}
+
+@ack(m: int, n: int): int {
+  zero: int = const 0;
+  one: int = const 1;
+  m_zero: bool = eq m zero;
+  br m_zero .base_m .rec_m;
+.base_m:
+  n_plus_one: int = add n one;
+  ret n_plus_one;
+.rec_m:
+  n_zero: bool = eq n zero;
+  br n_zero .base_n .rec_n;
+.base_n:
+  m_minus_one: int = sub m one;
+  one_arg: int = const 1;
+  result: int = call @ack m_minus_one one_arg;
+  ret result;
+.rec_n:
+  m_minus_one: int = sub m one;
+  n_minus_one: int = sub n one;
+  inner_result: int = call @ack m n_minus_one;
+  result: int = call @ack m_minus_one inner_result;
+  ret result;
+}`
+      },
+      small: {
+        code: `# Small example
+@main(x: int) {
+  one: int = const 1;
+  y: int = add x one;
+  ret y;
+}`
+      },
+      // General Datalog Examples
+      ancestry: {
+        rules: `# Family relationships
+
+.decl parent(x, y) .input;
+.decl ancestor(x, y) .output;
+
+.rule ancestor(x, y) :- 1 parent(x, y);
+.rule ancestor(x, z) :- 2 parent(x, y), ancestor(y, z);`,
+        facts: `# Family relationships facts
+
+4
+parent(john, mary);
+parent(mary, sam);
+parent(sam, peter);
+parent(peter, lisa);`
+      },
+      graph: {
+        rules: `# Graph reachability
+
+.decl edge(x, y) .input;
+.decl reachable(x, y) .output;
+
+.rule reachable(x, y) :- 1 edge(x, y);
+.rule reachable(x, z) :- 2 edge(x, y), reachable(y, z);`,
+        facts: `# Graph reachability facts
+
+5
+edge(a, b);
+edge(b, c);
+edge(c, d);
+edge(d, b);
+edge(a, e);`
+      },
+      company: {
+        rules: `# Company hierarchy
+
+.decl reports_to(x, y) .input;
+.decl above(x, y) .output;
+
+.rule above(x, y) :- 1 reports_to(y, x);
+.rule above(x, z) :- 2 reports_to(z, y), above(x, y);`,
+        facts: `# Company hierarchy facts
+
+4
+reports_to(alice, bob);
+reports_to(bob, carol);
+reports_to(david, bob);
+reports_to(carol, eve);`
+      },
+      social: {
+        rules: `# Social network
+
+.decl friend(x, y) .input;
+.decl friend_of_friend(x, y) .output;
+
+.rule friend_of_friend(x, y) :- 1 friend(x, y);
+.rule friend_of_friend(x, z) :- 2 friend(x, y), friend_of_friend(y, z);`,
+        facts: `# Social network facts
+
+5
+friend(alex, ben);
+friend(ben, charlie);
+friend(charlie, diana);
+friend(diana, emma);
+friend(emma, ben);`
+      }
+    };
+
+    // Initialize Monaco Editor
+    require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' } });
+    require(['vs/editor/editor.main'], async function () {
+      window.editor = monaco.editor.create(document.getElementById('editor'), {
+        value: analyses.ancestry.rules,
+        language: 'plaintext',
+        theme: 'vs-light',
+        minimap: { enabled: false }
+      });
+
+      window.factsEditor = monaco.editor.create(document.getElementById('facts'), {
+        value: analyses.ancestry.facts,
+        language: 'plaintext',
+        theme: 'vs-light',
+        minimap: { enabled: false },
+        readOnly: false
+      });
+
+      window.outputEditor = monaco.editor.create(document.getElementById('output'), {
+        value: '',
+        language: 'plaintext',
+        theme: 'vs-light',
+        minimap: { enabled: false },
+        readOnly: true
+      });
+
+      // Initialize WASM
+      await init();
+    });
+
+    window.updateAnalysis = function () {
+      const type = document.getElementById('analysisType').value;
+      if (type && analyses[type]) {
+        if (type === 'factorial' || type === 'fibonacci' || type === 'nested_loops' ||
+          type === 'variable_reuse' || type === 'multi_func' || type === 'ackerman' ||
+          type === 'small') {
+          window.editor.setValue(analyses[type].code);
+          document.getElementById('program-type').innerText = 'Bril Program';
+          document.getElementById('facts-type').innerText = 'Datalog Facts';
+          window.factsEditor.setValue('');
+          window.outputEditor.setValue('');
+        } else {
+          window.editor.setValue(analyses[type].rules);
+          document.getElementById('program-type').innerText = 'Datalog Rules';
+          document.getElementById('facts-type').innerText = 'Input Facts';
+          window.factsEditor.setValue(analyses[type].facts);
+          window.outputEditor.setValue('');
         }
-        init();
+      }
+    };
 
-        async function analyzeBril() {
-            if (!wasm) {
-                document.getElementById('output').textContent = 'Error: WASM module not initialized';
-                return;
-            }
-
-            try {
-                const brilCode = editor.getValue();
-                const result = await wasm.analyze_bril_program(brilCode);
-                document.getElementById('output').textContent = result;
-            } catch (e) {
-                document.getElementById('output').textContent = 'Error: ' + e.message;
-            }
+    window.runAnalysis = async function () {
+      const type = document.getElementById('analysisType').value;
+      if (type === 'factorial' || type === 'fibonacci' || type === 'nested_loops' ||
+        type === 'variable_reuse' || type === 'multi_func' || type === 'ackerman' ||
+        type === 'small') {
+        try {
+          const brilCode = window.editor.getValue();
+          const result = await analyze_bril_program(brilCode);
+          window.outputEditor.setValue(result);
+        } catch (e) {
+          window.outputEditor.setValue('Error: ' + e.toString());
         }
-    </script>
+      } else {
+        try {
+          const rules = window.editor.getValue();
+          const facts = window.factsEditor.getValue();
+          const result = await run_datalog_analysis(rules, facts);
+          window.outputEditor.setValue(result);
+        } catch (e) {
+          window.outputEditor.setValue('Error: ' + e.message);
+        }
+      }
+    };
+
+    // Initialize with the first analysis
+    window.updateAnalysis();
+  </script>
 </body>
+
 </html>
