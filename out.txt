@@ -1,173 +1,27 @@
-{
-  "functions": [
-    {
-      "instrs": [
-        {
-          "dest": "n",
-          "op": "const",
-          "type": "int",
-          "value": 10
-        },
-        {
-          "args": [
-            "n"
-          ],
-          "dest": "result",
-          "funcs": [
-            "fibonacci"
-          ],
-          "op": "call",
-          "type": "int"
-        },
-        {
-          "args": [
-            "result"
-          ],
-          "op": "print"
-        }
-      ],
-      "name": "main"
-    },
-    {
-      "args": [
-        {
-          "name": "n",
-          "type": "int"
-        }
-      ],
-      "instrs": [
-        {
-          "dest": "one",
-          "op": "const",
-          "type": "int",
-          "value": 1
-        },
-        {
-          "args": [
-            "n",
-            "one"
-          ],
-          "dest": "is_small",
-          "op": "le",
-          "type": "bool"
-        },
-        {
-          "args": [
-            "is_small"
-          ],
-          "labels": [
-            "base",
-            "loop"
-          ],
-          "op": "br"
-        },
-        {
-          "label": "base"
-        },
-        {
-          "args": [
-            "n"
-          ],
-          "op": "ret"
-        },
-        {
-          "label": "loop"
-        },
-        {
-          "dest": "i",
-          "op": "const",
-          "type": "int",
-          "value": 2
-        },
-        {
-          "dest": "prev2",
-          "op": "const",
-          "type": "int",
-          "value": 0
-        },
-        {
-          "dest": "prev1",
-          "op": "const",
-          "type": "int",
-          "value": 1
-        },
-        {
-          "label": "loop_header"
-        },
-        {
-          "args": [
-            "i",
-            "n"
-          ],
-          "dest": "cond",
-          "op": "le",
-          "type": "bool"
-        },
-        {
-          "args": [
-            "cond"
-          ],
-          "labels": [
-            "body",
-            "done"
-          ],
-          "op": "br"
-        },
-        {
-          "label": "body"
-        },
-        {
-          "args": [
-            "prev1",
-            "prev2"
-          ],
-          "dest": "sum",
-          "op": "add",
-          "type": "int"
-        },
-        {
-          "args": [
-            "prev1"
-          ],
-          "dest": "prev2",
-          "op": "id",
-          "type": "int"
-        },
-        {
-          "args": [
-            "sum"
-          ],
-          "dest": "prev1",
-          "op": "id",
-          "type": "int"
-        },
-        {
-          "args": [
-            "i",
-            "one"
-          ],
-          "dest": "i",
-          "op": "add",
-          "type": "int"
-        },
-        {
-          "labels": [
-            "loop_header"
-          ],
-          "op": "jmp"
-        },
-        {
-          "label": "done"
-        },
-        {
-          "args": [
-            "prev1"
-          ],
-          "op": "ret"
-        }
-      ],
-      "name": "fibonacci",
-      "type": "int"
-    }
-  ]
+@main {
+  n: int = const 10;
+  result: int = call @fibonacci n;
+  print result;
+}
+@fibonacci(n: int): int {
+  one: int = const 1;
+  is_small: bool = le n one;
+  br is_small .base .loop;
+.base:
+  ret n;
+.loop:
+  i: int = const 2;
+  prev2: int = const 0;
+  prev1: int = const 1;
+.loop_header:
+  cond: bool = le i n;
+  br cond .body .done;
+.body:
+  sum: int = add prev1 prev2;
+  prev2: int = id prev1;
+  prev1: int = id sum;
+  i: int = add i one;
+  jmp .loop_header;
+.done:
+  ret prev1;
 }
