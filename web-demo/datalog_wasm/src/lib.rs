@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use datalogint::bril_rs::BBProgram;
 use datalogint::implem::run_datalog;
 use datalogint::optimize_bril::perform_liveness_analysis;
@@ -27,6 +29,18 @@ pub fn run_datalog_analysis(rules: &str, facts: &str) -> Result<String, JsError>
         Err(e) => return Err(JsError::new(&format!("Error parsing rules: {}", e))),
     };
 
+    let output_fact_names = program
+        .decls
+        .iter()
+        .filter_map(|decl| {
+            if decl.kind == datalogint::parse::DeclKind::Output {
+                Some(decl.name.clone())
+            } else {
+                None
+            }
+        })
+        .collect::<HashSet<String>>();
+
     // Parse facts
     let mut facts_lexer = Token::lexer(facts);
     let facts = match parse_fact_vector(&mut facts_lexer) {
@@ -41,9 +55,10 @@ pub fn run_datalog_analysis(rules: &str, facts: &str) -> Result<String, JsError>
     };
 
     // Format the output facts as a string
-    let result = output_facts.iter().fold(String::new(), |acc, fact| {
-        format!("{}{}: {}\n", acc, fact.name, fact.params.join(", "))
-    });
+    let result = output_facts
+        .iter()
+        .filter(|fact| output_fact_names.contains(&fact.name))
+        .fold(String::new(), |acc, fact| format!("{}{}\n", acc, fact));
 
     Ok(result)
 }
