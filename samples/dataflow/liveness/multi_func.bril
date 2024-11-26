@@ -1,0 +1,25 @@
+@compute(x: int, y: int): int {
+  sum: int = add x y;
+  prod: int = mul x y;
+  result: int = add sum prod;
+  ret result;
+}
+
+@transform(val: int): int {
+  two: int = const 2;
+  square: int = mul val val;
+  doubled: int = mul square two;
+  ret doubled;
+}
+
+@main {
+  a: int = const 3;
+  b: int = const 4;
+  # First computation
+  temp1: int = call @compute a b;
+  # Transform result
+  temp2: int = call @transform temp1;
+  # Second computation with transformed value
+  result: int = call @compute temp2 b;
+  print result;
+}

@@ -1,0 +1,153 @@
+{
+  "functions": [
+    {
+      "args": [
+        {
+          "name": "x",
+          "type": "int"
+        },
+        {
+          "name": "y",
+          "type": "int"
+        }
+      ],
+      "instrs": [
+        {
+          "args": [
+            "x",
+            "y"
+          ],
+          "dest": "sum",
+          "op": "add",
+          "type": "int"
+        },
+        {
+          "args": [
+            "x",
+            "y"
+          ],
+          "dest": "prod",
+          "op": "mul",
+          "type": "int"
+        },
+        {
+          "args": [
+            "sum",
+            "prod"
+          ],
+          "dest": "result",
+          "op": "add",
+          "type": "int"
+        },
+        {
+          "args": [
+            "result"
+          ],
+          "op": "ret"
+        }
+      ],
+      "name": "compute",
+      "type": "int"
+    },
+    {
+      "args": [
+        {
+          "name": "val",
+          "type": "int"
+        }
+      ],
+      "instrs": [
+        {
+          "dest": "two",
+          "op": "const",
+          "type": "int",
+          "value": 2
+        },
+        {
+          "args": [
+            "val",
+            "val"
+          ],
+          "dest": "square",
+          "op": "mul",
+          "type": "int"
+        },
+        {
+          "args": [
+            "square",
+            "two"
+          ],
+          "dest": "doubled",
+          "op": "mul",
+          "type": "int"
+        },
+        {
+          "args": [
+            "doubled"
+          ],
+          "op": "ret"
+        }
+      ],
+      "name": "transform",
+      "type": "int"
+    },
+    {
+      "instrs": [
+        {
+          "dest": "a",
+          "op": "const",
+          "type": "int",
+          "value": 3
+        },
+        {
+          "dest": "b",
+          "op": "const",
+          "type": "int",
+          "value": 4
+        },
+        {
+          "args": [
+            "a",
+            "b"
+          ],
+          "dest": "temp1",
+          "funcs": [
+            "compute"
+          ],
+          "op": "call",
+          "type": "int"
+        },
+        {
+          "args": [
+            "temp1"
+          ],
+          "dest": "temp2",
+          "funcs": [
+            "transform"
+          ],
+          "op": "call",
+          "type": "int"
+        },
+        {
+          "args": [
+            "temp2",
+            "b"
+          ],
+          "dest": "result",
+          "funcs": [
+            "compute"
+          ],
+          "op": "call",
+          "type": "int"
+        },
+        {
+          "args": [
+            "result"
+          ],
+          "op": "print"
+        }
+      ],
+      "name": "main"
+    }
+  ]
+}

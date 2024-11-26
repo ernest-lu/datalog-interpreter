@@ -1,0 +1,19 @@
+@main {
+  n: int = const 5;
+  result: int = call @factorial n;
+  print result;
+}
+
+@factorial(n: int): int {
+  zero: int = const 0;
+  one: int = const 1;
+  is_zero: bool = eq n zero;
+  br is_zero .base .recurse;
+.base:
+  ret one;
+.recurse:
+  n_minus_one: int = sub n one;
+  fact: int = call @factorial n_minus_one;
+  result: int = mul n fact;
+  ret result;
+}

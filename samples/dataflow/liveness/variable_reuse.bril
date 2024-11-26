@@ -1,0 +1,24 @@
+@main {
+  a: int = const 5;
+  b: int = const 10;
+  # First block using a and b
+  temp: int = mul a b;
+  twenty: int = const 20;
+  cond: bool = gt temp twenty;
+  br cond .then .else;
+.then:
+  # Redefine a in this block
+  a: int = const 2;
+  result: int = mul a temp;
+  jmp .merge;
+.else:
+  # Redefine b in this block
+  b: int = const 3;
+  result: int = mul b temp;
+  jmp .merge;
+.merge:
+  # Use both redefined variables
+  final: int = add a b;
+  print final;
+  print result;
+}

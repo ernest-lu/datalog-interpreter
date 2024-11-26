@@ -1,0 +1,122 @@
+{
+  "functions": [
+    {
+      "instrs": [
+        {
+          "dest": "n",
+          "op": "const",
+          "type": "int",
+          "value": 5
+        },
+        {
+          "args": [
+            "n"
+          ],
+          "dest": "result",
+          "funcs": [
+            "factorial"
+          ],
+          "op": "call",
+          "type": "int"
+        },
+        {
+          "args": [
+            "result"
+          ],
+          "op": "print"
+        }
+      ],
+      "name": "main"
+    },
+    {
+      "args": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "instrs": [
+        {
+          "dest": "zero",
+          "op": "const",
+          "type": "int",
+          "value": 0
+        },
+        {
+          "dest": "one",
+          "op": "const",
+          "type": "int",
+          "value": 1
+        },
+        {
+          "args": [
+            "n",
+            "zero"
+          ],
+          "dest": "is_zero",
+          "op": "eq",
+          "type": "bool"
+        },
+        {
+          "args": [
+            "is_zero"
+          ],
+          "labels": [
+            "base",
+            "recurse"
+          ],
+          "op": "br"
+        },
+        {
+          "label": "base"
+        },
+        {
+          "args": [
+            "one"
+          ],
+          "op": "ret"
+        },
+        {
+          "label": "recurse"
+        },
+        {
+          "args": [
+            "n",
+            "one"
+          ],
+          "dest": "n_minus_one",
+          "op": "sub",
+          "type": "int"
+        },
+        {
+          "args": [
+            "n_minus_one"
+          ],
+          "dest": "fact",
+          "funcs": [
+            "factorial"
+          ],
+          "op": "call",
+          "type": "int"
+        },
+        {
+          "args": [
+            "n",
+            "fact"
+          ],
+          "dest": "result",
+          "op": "mul",
+          "type": "int"
+        },
+        {
+          "args": [
+            "result"
+          ],
+          "op": "ret"
+        }
+      ],
+      "name": "factorial",
+      "type": "int"
+    }
+  ]
+}

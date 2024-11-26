@@ -17,7 +17,6 @@ pub fn analyze_bril_program(bril_src: &str) -> Result<String, JsError> {
         Ok(p) => p,
         Err(e) => return Err(JsError::new(&format!("Error parsing Bril: {}", e))),
     };
-    dbg!(&program);
     let prog = perform_liveness_analysis(program);
     Ok(bril_to_string(&prog))
 }

@@ -1,0 +1,29 @@
+@main {
+  n: int = const 10;
+  result: int = call @fibonacci n;
+  print result;
+}
+
+@fibonacci(n: int): int {
+  zero: int = const 0;
+  one: int = const 1;
+  is_small: bool = le n one;
+  br is_small .base .loop;
+.base:
+  ret n;
+.loop:
+  i: int = const 2;
+  prev2: int = const 0;
+  prev1: int = const 1;
+.loop_header:
+  cond: bool = le i n;
+  br cond .body .done;
+.body:
+  sum: int = add prev1 prev2;
+  prev2: int = id prev1;
+  prev1: int = id sum;
+  i: int = add i one;
+  jmp .loop_header;
+.done:
+  ret prev1;
+}

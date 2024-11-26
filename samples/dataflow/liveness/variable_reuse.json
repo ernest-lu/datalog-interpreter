@@ -1,0 +1,127 @@
+{
+  "functions": [
+    {
+      "instrs": [
+        {
+          "dest": "a",
+          "op": "const",
+          "type": "int",
+          "value": 5
+        },
+        {
+          "dest": "b",
+          "op": "const",
+          "type": "int",
+          "value": 10
+        },
+        {
+          "args": [
+            "a",
+            "b"
+          ],
+          "dest": "temp",
+          "op": "mul",
+          "type": "int"
+        },
+        {
+          "dest": "twenty",
+          "op": "const",
+          "type": "int",
+          "value": 20
+        },
+        {
+          "args": [
+            "temp",
+            "twenty"
+          ],
+          "dest": "cond",
+          "op": "gt",
+          "type": "bool"
+        },
+        {
+          "args": [
+            "cond"
+          ],
+          "labels": [
+            "then",
+            "else"
+          ],
+          "op": "br"
+        },
+        {
+          "label": "then"
+        },
+        {
+          "dest": "a",
+          "op": "const",
+          "type": "int",
+          "value": 2
+        },
+        {
+          "args": [
+            "a",
+            "temp"
+          ],
+          "dest": "result",
+          "op": "mul",
+          "type": "int"
+        },
+        {
+          "labels": [
+            "merge"
+          ],
+          "op": "jmp"
+        },
+        {
+          "label": "else"
+        },
+        {
+          "dest": "b",
+          "op": "const",
+          "type": "int",
+          "value": 3
+        },
+        {
+          "args": [
+            "b",
+            "temp"
+          ],
+          "dest": "result",
+          "op": "mul",
+          "type": "int"
+        },
+        {
+          "labels": [
+            "merge"
+          ],
+          "op": "jmp"
+        },
+        {
+          "label": "merge"
+        },
+        {
+          "args": [
+            "a",
+            "b"
+          ],
+          "dest": "final",
+          "op": "add",
+          "type": "int"
+        },
+        {
+          "args": [
+            "final"
+          ],
+          "op": "print"
+        },
+        {
+          "args": [
+            "result"
+          ],
+          "op": "print"
+        }
+      ],
+      "name": "main"
+    }
+  ]
+}

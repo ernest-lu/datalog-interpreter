@@ -1,0 +1,176 @@
+{
+  "functions": [
+    {
+      "instrs": [
+        {
+          "dest": "rows",
+          "op": "const",
+          "type": "int",
+          "value": 3
+        },
+        {
+          "dest": "cols",
+          "op": "const",
+          "type": "int",
+          "value": 4
+        },
+        {
+          "dest": "i",
+          "op": "const",
+          "type": "int",
+          "value": 0
+        },
+        {
+          "dest": "sum",
+          "op": "const",
+          "type": "int",
+          "value": 0
+        },
+        {
+          "dest": "zero",
+          "op": "const",
+          "type": "int",
+          "value": 0
+        },
+        {
+          "dest": "one",
+          "op": "const",
+          "type": "int",
+          "value": 1
+        },
+        {
+          "label": "outer_loop"
+        },
+        {
+          "args": [
+            "i",
+            "rows"
+          ],
+          "dest": "cond1",
+          "op": "lt",
+          "type": "bool"
+        },
+        {
+          "args": [
+            "cond1"
+          ],
+          "labels": [
+            "outer_body",
+            "done"
+          ],
+          "op": "br"
+        },
+        {
+          "label": "outer_body"
+        },
+        {
+          "dest": "j",
+          "op": "const",
+          "type": "int",
+          "value": 0
+        },
+        {
+          "label": "inner_loop"
+        },
+        {
+          "args": [
+            "j",
+            "cols"
+          ],
+          "dest": "cond2",
+          "op": "lt",
+          "type": "bool"
+        },
+        {
+          "args": [
+            "cond2"
+          ],
+          "labels": [
+            "inner_body",
+            "outer_continue"
+          ],
+          "op": "br"
+        },
+        {
+          "label": "inner_body"
+        },
+        {
+          "args": [
+            "i",
+            "j"
+          ],
+          "dest": "tmp1",
+          "op": "add",
+          "type": "int"
+        },
+        {
+          "dest": "two",
+          "op": "const",
+          "type": "int",
+          "value": 2
+        },
+        {
+          "args": [
+            "tmp1",
+            "two"
+          ],
+          "dest": "val",
+          "op": "mul",
+          "type": "int"
+        },
+        {
+          "args": [
+            "sum",
+            "val"
+          ],
+          "dest": "sum",
+          "op": "add",
+          "type": "int"
+        },
+        {
+          "args": [
+            "j",
+            "one"
+          ],
+          "dest": "j",
+          "op": "add",
+          "type": "int"
+        },
+        {
+          "labels": [
+            "inner_loop"
+          ],
+          "op": "jmp"
+        },
+        {
+          "label": "outer_continue"
+        },
+        {
+          "args": [
+            "i",
+            "one"
+          ],
+          "dest": "i",
+          "op": "add",
+          "type": "int"
+        },
+        {
+          "labels": [
+            "outer_loop"
+          ],
+          "op": "jmp"
+        },
+        {
+          "label": "done"
+        },
+        {
+          "args": [
+            "sum"
+          ],
+          "op": "print"
+        }
+      ],
+      "name": "main"
+    }
+  ]
+}

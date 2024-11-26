@@ -1,0 +1,29 @@
+@main {
+  rows: int = const 3;
+  cols: int = const 4;
+  i: int = const 0;
+  sum: int = const 0;
+  zero: int = const 0;
+  one: int = const 1;
+.outer_loop:
+  cond1: bool = lt i rows;
+  br cond1 .outer_body .done;
+.outer_body:
+  j: int = const 0;
+.inner_loop:
+  cond2: bool = lt j cols;
+  br cond2 .inner_body .outer_continue;
+.inner_body:
+  # Compute (i + j) * 2 for each cell
+  tmp1: int = add i j;
+  two: int = const 2;
+  val: int = mul tmp1 two;
+  sum: int = add sum val;
+  j: int = add j one;
+  jmp .inner_loop;
+.outer_continue:
+  i: int = add i one;
+  jmp .outer_loop;
+.done:
+  print sum;
+}
