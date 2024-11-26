@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datalog PTR Analysis</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .editor {
+            flex: 1;
+            border: 1px solid #ccc;
+        }
+        .output {
+            flex: 1;
+            border: 1px solid #ccc;
+            padding: 10px;
+            overflow: auto;
+            white-space: pre-wrap;
+            font-family: monospace;
+            background-color: #f5f5f5;
+        }
+        .button-container {
+            margin: 10px 0;
+        }
+        button {
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        h2 {
+            margin: 0 0 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="editor-container">
+            <h2>Bril Input</h2>
+            <div id="editor" class="editor"></div>
+            <div class="button-container">
+                <button onclick="analyzeBril()">Analyze</button>
+            </div>
+        </div>
+        <div class="editor-container">
+            <h2>Analysis Output</h2>
+            <div id="output" class="output"></div>
+        </div>
+    </div>
+
+    <script>
+        let editor;
+        const defaultCode = `@main {
+  a: int = const 1;
+  b: int = const 2;
+  sum: int = add a b;
+  print sum;
+}`;
+
+        // Initialize Monaco Editor
+        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' }});
+        require(['vs/editor/editor.main'], function() {
+            editor = monaco.editor.create(document.getElementById('editor'), {
+                value: defaultCode,
+                language: 'plaintext',
+                theme: 'vs-light',
+                minimap: { enabled: false },
+                automaticLayout: true
+            });
+        });
+
+        // Initialize WebAssembly module
+        let wasm;
+        async function init() {
+            try {
+                wasm = await import('./datalog_wasm.js');
+                await wasm.default();
+                console.log('WASM module initialized');
+            } catch (e) {
+                console.error('Failed to initialize WASM:', e);
+                document.getElementById('output').textContent = 'Error: Failed to initialize WASM module';
+            }
+        }
+        init();
+
+        async function analyzeBril() {
+            if (!wasm) {
+                document.getElementById('output').textContent = 'Error: WASM module not initialized';
+                return;
+            }
+
+            try {
+                const brilCode = editor.getValue();
+                const result = await wasm.analyze_bril_program(brilCode);
+                document.getElementById('output').textContent = result;
+            } catch (e) {
+                document.getElementById('output').textContent = 'Error: ' + e.message;
+            }
+        }
+    </script>
+</body>
+</html>
