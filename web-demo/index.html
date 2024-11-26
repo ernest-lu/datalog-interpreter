@@ -1,111 +1,13 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="utf-8">
-    <title>Datalog Analysis Demo</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        textarea {
-            width: 100%;
-            height: 300px;
-            font-family: monospace;
-            margin-bottom: 10px;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .sample {
-            margin-bottom: 10px;
-            padding: 10px;
-            background: #f0f0f0;
-            cursor: pointer;
-        }
-    </style>
-</head>
-
-<body>
-    <h1>Datalog Analysis Demo</h1>
-    <div class="container">
-        <div>
-            <h2>Input</h2>
-            <textarea id="input">2
-edge(x, y);
-edge(y, z);</textarea>
-            <button onclick="runAnalysis()">Analyze</button>
-            <h3>Sample Inputs</h3>
-            <div id="samples"></div>
-        </div>
-        <div>
-            <h2>Output</h2>
-            <textarea id="output" readonly></textarea>
-        </div>
-    </div>
-
-    <script type="module">
-        import init, { run_datalog_analysis } from './pkg/datalog_ptr_web.js';
-
-        window.runAnalysis = async function () {
-            await init();
-            const input = document.getElementById('input').value;
-            const output = run_datalog_analysis(input);
-            document.getElementById('output').value = output;
-        };
-
-        // Sample inputs from the samples directory
-        const samples = [
-            {
-                name: "Simple Path",
-                content: `2\nedge(x, y);\nedge(y, z);`
-            },
-            {
-                name: "Triangle",
-                content: `3\nedge(a, b);\nedge(b, c);\nedge(c, a);`
-            },
-            {
-                name: "Tree Structure",
-                content: `3\nedge(root, left);\nedge(root, right);\nedge(left, leaf);`
-            },
-            {
-                name: "Disconnected Components",
-                content: `4\nedge(a, b);\nedge(b, c);\nedge(x, y);\nedge(y, z);`
-            },
-            {
-                name: "Star Pattern",
-                content: `4\nedge(center, n1);\nedge(center, n2);\nedge(center, n3);\nedge(center, n4);`
-            }
-        ];
-
-        const samplesDiv = document.getElementById('samples');
-        samples.forEach(sample => {
-            const div = document.createElement('div');
-            div.className = 'sample';
-            div.textContent = sample.name;
-            div.onclick = () => {
-                document.getElementById('input').value = sample.content;
-            };
-            samplesDiv.appendChild(div);
-        });
-
-        // Run initial analysis
-        window.addEventListener('load', runAnalysis);
-    </script>
-</body>
-
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + Svelte + TS</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>
