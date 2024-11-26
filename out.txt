@@ -1,0 +1,159 @@
+facts: [Fact { name: "var_used", params: ["default_block_instr_1", "n"] }, Fact { name: "var_used", params: ["default_block_instr_2", "result"] }, Fact { name: "undefined", params: ["default_block_instr_0", "result"] }, Fact { name: "undefined", params: ["default_block_instr_1", "n"] }, Fact { name: "undefined", params: ["default_block_instr_2", "result"] }, Fact { name: "undefined", params: ["default_block_instr_2", "n"] }, Fact { name: "successor", params: ["default_block_instr_0", "default_block_instr_1"] }, Fact { name: "successor", params: ["default_block_instr_1", "default_block_instr_2"] }]
+facts_out: [Fact { name: "var_live", params: ["default_block_instr_0", "n"] }, Fact { name: "var_live", params: ["default_block_instr_1", "result"] }]
+facts: [Fact { name: "var_used", params: ["default_block_instr_2", "one"] }, Fact { name: "var_used", params: ["default_block_instr_3", "is_small"] }, Fact { name: "var_used", params: ["loop_header_instr_0", "i"] }, Fact { name: "var_used", params: ["loop_header_instr_1", "cond"] }, Fact { name: "var_used", params: ["body_instr_0", "prev1"] }, Fact { name: "var_used", params: ["body_instr_0", "prev2"] }, Fact { name: "var_used", params: ["body_instr_1", "prev1"] }, Fact { name: "var_used", params: ["body_instr_2", "sum"] }, Fact { name: "var_used", params: ["body_instr_3", "i"] }, Fact { name: "var_used", params: ["body_instr_3", "one"] }, Fact { name: "var_used", params: ["done_instr_0", "prev1"] }, Fact { name: "undefined", params: ["default_block_instr_0", "cond"] }, Fact { name: "undefined", params: ["default_block_instr_0", "one"] }, Fact { name: "undefined", params: ["default_block_instr_0", "i"] }, Fact { name: "undefined", params: ["default_block_instr_0", "is_small"] }, Fact { name: "undefined", params: ["default_block_instr_0", "prev2"] }, Fact { name: "undefined", params: ["default_block_instr_0", "prev1"] }, Fact { name: "undefined", params: ["default_block_instr_0", "sum"] }, Fact { name: "undefined", params: ["default_block_instr_1", "zero"] }, Fact { name: "undefined", params: ["default_block_instr_1", "cond"] }, Fact { name: "undefined", params: ["default_block_instr_1", "i"] }, Fact { name: "undefined", params: ["default_block_instr_1", "is_small"] }, Fact { name: "undefined", params: ["default_block_instr_1", "prev2"] }, Fact { name: "undefined", params: ["default_block_instr_1", "prev1"] }, Fact { name: "undefined", params: ["default_block_instr_1", "sum"] }, Fact { name: "undefined", params: ["default_block_instr_2", "zero"] }, Fact { name: "undefined", params: ["default_block_instr_2", "cond"] }, Fact { name: "undefined", params: ["default_block_instr_2", "one"] }, Fact { name: "undefined", params: ["default_block_instr_2", "i"] }, Fact { name: "undefined", params: ["default_block_instr_2", "prev2"] }, Fact { name: "undefined", params: ["default_block_instr_2", "prev1"] }, Fact { name: "undefined", params: ["default_block_instr_2", "sum"] }, Fact { name: "undefined", params: ["default_block_instr_3", "zero"] }, Fact { name: "undefined", params: ["default_block_instr_3", "cond"] }, Fact { name: "undefined", params: ["default_block_instr_3", "one"] }, Fact { name: "undefined", params: ["default_block_instr_3", "i"] }, Fact { name: "undefined", params: ["default_block_instr_3", "is_small"] }, Fact { name: "undefined", params: ["default_block_instr_3", "prev2"] }, Fact { name: "undefined", params: ["default_block_instr_3", "prev1"] }, Fact { name: "undefined", params: ["default_block_instr_3", "sum"] }, Fact { name: "undefined", params: ["base_instr_0", "zero"] }, Fact { name: "undefined", params: ["base_instr_0", "cond"] }, Fact { name: "undefined", params: ["base_instr_0", "one"] }, Fact { name: "undefined", params: ["base_instr_0", "i"] }, Fact { name: "undefined", params: ["base_instr_0", "is_small"] }, Fact { name: "undefined", params: ["base_instr_0", "prev2"] }, Fact { name: "undefined", params: ["base_instr_0", "prev1"] }, Fact { name: "undefined", params: ["base_instr_0", "sum"] }, Fact { name: "undefined", params: ["loop_instr_0", "zero"] }, Fact { name: "undefined", params: ["loop_instr_0", "cond"] }, Fact { name: "undefined", params: ["loop_instr_0", "one"] }, Fact { name: "undefined", params: ["loop_instr_0", "is_small"] }, Fact { name: "undefined", params: ["loop_instr_0", "prev2"] }, Fact { name: "undefined", params: ["loop_instr_0", "prev1"] }, Fact { name: "undefined", params: ["loop_instr_0", "sum"] }, Fact { name: "undefined", params: ["loop_instr_1", "zero"] }, Fact { name: "undefined", params: ["loop_instr_1", "cond"] }, Fact { name: "undefined", params: ["loop_instr_1", "one"] }, Fact { name: "undefined", params: ["loop_instr_1", "i"] }, Fact { name: "undefined", params: ["loop_instr_1", "is_small"] }, Fact { name: "undefined", params: ["loop_instr_1", "prev1"] }, Fact { name: "undefined", params: ["loop_instr_1", "sum"] }, Fact { name: "undefined", params: ["loop_instr_2", "zero"] }, Fact { name: "undefined", params: ["loop_instr_2", "cond"] }, Fact { name: "undefined", params: ["loop_instr_2", "one"] }, Fact { name: "undefined", params: ["loop_instr_2", "i"] }, Fact { name: "undefined", params: ["loop_instr_2", "is_small"] }, Fact { name: "undefined", params: ["loop_instr_2", "prev2"] }, Fact { name: "undefined", params: ["loop_instr_2", "sum"] }, Fact { name: "undefined", params: ["loop_header_instr_0", "zero"] }, Fact { name: "undefined", params: ["loop_header_instr_0", "one"] }, Fact { name: "undefined", params: ["loop_header_instr_0", "i"] }, Fact { name: "undefined", params: ["loop_header_instr_0", "is_small"] }, Fact { name: "undefined", params: ["loop_header_instr_0", "prev2"] }, Fact { name: "undefined", params: ["loop_header_instr_0", "prev1"] }, Fact { name: "undefined", params: ["loop_header_instr_0", "sum"] }, Fact { name: "undefined", params: ["loop_header_instr_1", "zero"] }, Fact { name: "undefined", params: ["loop_header_instr_1", "cond"] }, Fact { name: "undefined", params: ["loop_header_instr_1", "one"] }, Fact { name: "undefined", params: ["loop_header_instr_1", "i"] }, Fact { name: "undefined", params: ["loop_header_instr_1", "is_small"] }, Fact { name: "undefined", params: ["loop_header_instr_1", "prev2"] }, Fact { name: "undefined", params: ["loop_header_instr_1", "prev1"] }, Fact { name: "undefined", params: ["loop_header_instr_1", "sum"] }, Fact { name: "undefined", params: ["body_instr_0", "zero"] }, Fact { name: "undefined", params: ["body_instr_0", "cond"] }, Fact { name: "undefined", params: ["body_instr_0", "one"] }, Fact { name: "undefined", params: ["body_instr_0", "i"] }, Fact { name: "undefined", params: ["body_instr_0", "is_small"] }, Fact { name: "undefined", params: ["body_instr_0", "prev2"] }, Fact { name: "undefined", params: ["body_instr_0", "prev1"] }, Fact { name: "undefined", params: ["body_instr_1", "zero"] }, Fact { name: "undefined", params: ["body_instr_1", "cond"] }, Fact { name: "undefined", params: ["body_instr_1", "one"] }, Fact { name: "undefined", params: ["body_instr_1", "i"] }, Fact { name: "undefined", params: ["body_instr_1", "is_small"] }, Fact { name: "undefined", params: ["body_instr_1", "prev1"] }, Fact { name: "undefined", params: ["body_instr_1", "sum"] }, Fact { name: "undefined", params: ["body_instr_2", "zero"] }, Fact { name: "undefined", params: ["body_instr_2", "cond"] }, Fact { name: "undefined", params: ["body_instr_2", "one"] }, Fact { name: "undefined", params: ["body_instr_2", "i"] }, Fact { name: "undefined", params: ["body_instr_2", "is_small"] }, Fact { name: "undefined", params: ["body_instr_2", "prev2"] }, Fact { name: "undefined", params: ["body_instr_2", "sum"] }, Fact { name: "undefined", params: ["body_instr_3", "zero"] }, Fact { name: "undefined", params: ["body_instr_3", "cond"] }, Fact { name: "undefined", params: ["body_instr_3", "one"] }, Fact { name: "undefined", params: ["body_instr_3", "is_small"] }, Fact { name: "undefined", params: ["body_instr_3", "prev2"] }, Fact { name: "undefined", params: ["body_instr_3", "prev1"] }, Fact { name: "undefined", params: ["body_instr_3", "sum"] }, Fact { name: "undefined", params: ["body_instr_4", "zero"] }, Fact { name: "undefined", params: ["body_instr_4", "cond"] }, Fact { name: "undefined", params: ["body_instr_4", "one"] }, Fact { name: "undefined", params: ["body_instr_4", "i"] }, Fact { name: "undefined", params: ["body_instr_4", "is_small"] }, Fact { name: "undefined", params: ["body_instr_4", "prev2"] }, Fact { name: "undefined", params: ["body_instr_4", "prev1"] }, Fact { name: "undefined", params: ["body_instr_4", "sum"] }, Fact { name: "undefined", params: ["done_instr_0", "zero"] }, Fact { name: "undefined", params: ["done_instr_0", "cond"] }, Fact { name: "undefined", params: ["done_instr_0", "one"] }, Fact { name: "undefined", params: ["done_instr_0", "i"] }, Fact { name: "undefined", params: ["done_instr_0", "is_small"] }, Fact { name: "undefined", params: ["done_instr_0", "prev2"] }, Fact { name: "undefined", params: ["done_instr_0", "prev1"] }, Fact { name: "undefined", params: ["done_instr_0", "sum"] }, Fact { name: "successor", params: ["loop_header_instr_0", "loop_header_instr_1"] }, Fact { name: "successor", params: ["default_block_instr_2", "default_block_instr_3"] }, Fact { name: "successor", params: ["loop_header_instr_1", "body_instr_0"] }, Fact { name: "successor", params: ["loop_header_instr_1", "done_instr_0"] }, Fact { name: "successor", params: ["body_instr_0", "body_instr_1"] }, Fact { name: "successor", params: ["body_instr_4", "loop_header_instr_0"] }, Fact { name: "successor", params: ["body_instr_1", "body_instr_2"] }, Fact { name: "successor", params: ["body_instr_2", "body_instr_3"] }, Fact { name: "successor", params: ["loop_instr_1", "loop_instr_2"] }, Fact { name: "successor", params: ["default_block_instr_0", "default_block_instr_1"] }, Fact { name: "successor", params: ["body_instr_3", "body_instr_4"] }, Fact { name: "successor", params: ["default_block_instr_1", "default_block_instr_2"] }, Fact { name: "successor", params: ["loop_instr_0", "loop_instr_1"] }, Fact { name: "successor", params: ["default_block_instr_3", "base_instr_0"] }, Fact { name: "successor", params: ["default_block_instr_3", "loop_instr_0"] }]
+facts_out: [Fact { name: "var_live", params: ["default_block_instr_2", "is_small"] }, Fact { name: "var_live", params: ["loop_header_instr_1", "i"] }, Fact { name: "var_live", params: ["body_instr_3", "i"] }, Fact { name: "var_live", params: ["body_instr_2", "one"] }, Fact { name: "var_live", params: ["loop_header_instr_0", "prev2"] }, Fact { name: "var_live", params: ["loop_header_instr_0", "i"] }, Fact { name: "var_live", params: ["loop_header_instr_1", "prev1"] }, Fact { name: "var_live", params: ["loop_header_instr_0", "cond"] }, Fact { name: "var_live", params: ["body_instr_4", "one"] }, Fact { name: "var_live", params: ["default_block_instr_1", "one"] }, Fact { name: "var_live", params: ["body_instr_4", "prev2"] }, Fact { name: "var_live", params: ["body_instr_2", "prev1"] }, Fact { name: "var_live", params: ["loop_header_instr_1", "one"] }, Fact { name: "var_live", params: ["loop_header_instr_0", "one"] }, Fact { name: "var_live", params: ["body_instr_1", "i"] }, Fact { name: "var_live", params: ["body_instr_2", "prev2"] }, Fact { name: "var_live", params: ["body_instr_0", "sum"] }, Fact { name: "var_live", params: ["body_instr_2", "i"] }, Fact { name: "var_live", params: ["body_instr_0", "one"] }, Fact { name: "var_live", params: ["body_instr_0", "i"] }, Fact { name: "var_live", params: ["body_instr_1", "sum"] }, Fact { name: "var_live", params: ["body_instr_4", "prev1"] }, Fact { name: "var_live", params: ["body_instr_3", "one"] }, Fact { name: "var_live", params: ["body_instr_4", "i"] }, Fact { name: "var_live", params: ["body_instr_0", "prev1"] }, Fact { name: "var_live", params: ["loop_header_instr_1", "prev2"] }, Fact { name: "var_live", params: ["body_instr_3", "prev2"] }, Fact { name: "var_live", params: ["body_instr_1", "prev2"] }, Fact { name: "var_live", params: ["body_instr_1", "one"] }, Fact { name: "var_live", params: ["loop_header_instr_0", "prev1"] }, Fact { name: "var_live", params: ["body_instr_3", "prev1"] }]
+{
+  "functions": [
+    {
+      "instrs": [
+        {
+          "dest": "n",
+          "op": "const",
+          "type": "int",
+          "value": 10
+        },
+        {
+          "args": [
+            "n"
+          ],
+          "dest": "result",
+          "funcs": [
+            "fibonacci"
+          ],
+          "op": "call",
+          "type": "int"
+        },
+        {
+          "args": [
+            "result"
+          ],
+          "op": "print"
+        }
+      ],
+      "name": "main"
+    },
+    {
+      "args": [
+        {
+          "name": "n",
+          "type": "int"
+        }
+      ],
+      "instrs": [
+        {
+          "dest": "one",
+          "op": "const",
+          "type": "int",
+          "value": 1
+        },
+        {
+          "args": [
+            "n",
+            "one"
+          ],
+          "dest": "is_small",
+          "op": "le",
+          "type": "bool"
+        },
+        {
+          "args": [
+            "is_small"
+          ],
+          "labels": [
+            "base",
+            "loop"
+          ],
+          "op": "br"
+        },
+        {
+          "label": "base"
+        },
+        {
+          "args": [
+            "n"
+          ],
+          "op": "ret"
+        },
+        {
+          "label": "loop"
+        },
+        {
+          "label": "loop_header"
+        },
+        {
+          "args": [
+            "i",
+            "n"
+          ],
+          "dest": "cond",
+          "op": "le",
+          "type": "bool"
+        },
+        {
+          "args": [
+            "cond"
+          ],
+          "labels": [
+            "body",
+            "done"
+          ],
+          "op": "br"
+        },
+        {
+          "label": "body"
+        },
+        {
+          "args": [
+            "prev1",
+            "prev2"
+          ],
+          "dest": "sum",
+          "op": "add",
+          "type": "int"
+        },
+        {
+          "args": [
+            "prev1"
+          ],
+          "dest": "prev2",
+          "op": "id",
+          "type": "int"
+        },
+        {
+          "args": [
+            "sum"
+          ],
+          "dest": "prev1",
+          "op": "id",
+          "type": "int"
+        },
+        {
+          "args": [
+            "i",
+            "one"
+          ],
+          "dest": "i",
+          "op": "add",
+          "type": "int"
+        },
+        {
+          "labels": [
+            "loop_header"
+          ],
+          "op": "jmp"
+        },
+        {
+          "label": "done"
+        },
+        {
+          "args": [
+            "prev1"
+          ],
+          "op": "ret"
+        }
+      ],
+      "name": "fibonacci",
+      "type": "int"
+    }
+  ]
+}

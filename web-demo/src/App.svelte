@@ -3,7 +3,7 @@
   import init, {
     analyze_bril_program,
     run_datalog_analysis,
-  } from "../datalog_wasm/pkg/datalog_wasm";
+  } from "../datalog_wasm/pkg/datalog_wasm.js";
 
   // Initialize the Wasm module
   init();
