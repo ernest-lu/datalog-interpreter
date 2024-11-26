@@ -1,4 +1,4 @@
-name: Deploy Web Demo and Docs
+name: Deploy Web Demo 
 
 on: [push, pull_request]
 
@@ -14,11 +14,9 @@ jobs:
     - name: Install wasm-pack
       run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 
-    - name: Cache
-      uses: Swatinem/rust-cache@v2
-
-    - name: Build
-      run: make web
+    - name: Build WASM
+      working-directory: web-demo/datalog_wasm 
+      run: wasm-pack build --target web 
 
     # Upload the built website as an artifact, so that runs which are not deployed
     # (i.e. other branches and PRs) to Github Pages can be be downloaded
