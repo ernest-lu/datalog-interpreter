@@ -1,12 +1,17 @@
 use std::collections::{HashMap, HashSet};
 use std::hash::Hash;
 use std::iter::successors;
-use std::vec;
+use std::{convert, vec};
 
+use crate::bril_rs::{
+    load_program_from_read, BBFunction, BBProgram, Code, EffectOps, Function, Instruction, Program,
+};
 use crate::parse::Fact;
-use bril_rs::{load_program_from_read, output_program};
-use brilirs::basic_block::BBFunction;
-use brilirs::basic_block::BBProgram;
+
+// copyiing over bril_rs because we can't use it as a cargo dependency // has platform specific code
+// pub mod bril_rs {
+//     struct Program {}
+// }
 
 pub fn parse_bril(input: &str) -> Result<BBProgram, String> {
     let program = load_program_from_read(input.as_bytes());
@@ -37,8 +42,8 @@ fn get_instr_successors(bril_fn: &BBFunction) -> HashMap<String, Vec<String>> {
 
             // successor instructions
             match instr {
-                bril_rs::Instruction::Effect {
-                    op: bril_rs::EffectOps::Jump | bril_rs::EffectOps::Branch,
+                Instruction::Effect {
+                    op: EffectOps::Jump | EffectOps::Branch,
                     labels,
                     ..
                 } => {
@@ -56,11 +61,9 @@ fn get_instr_successors(bril_fn: &BBFunction) -> HashMap<String, Vec<String>> {
     instr_successors
 }
 
-fn get_instr_uses(instr: &bril_rs::Instruction) -> Vec<String> {
+fn get_instr_uses(instr: &Instruction) -> Vec<String> {
     match instr {
-        bril_rs::Instruction::Value { args, .. } | bril_rs::Instruction::Effect { args, .. } => {
-            args.clone()
-        }
+        Instruction::Value { args, .. } | Instruction::Effect { args, .. } => args.clone(),
         _ => vec![], // empty vector for other instructions
     }
 }
@@ -70,8 +73,7 @@ fn get_all_defined_vars(bril_fn: &BBFunction) -> HashSet<String> {
     for block in &bril_fn.blocks {
         for (i, instr) in block.instrs.iter().enumerate() {
             match instr {
-                bril_rs::Instruction::Constant { dest, .. }
-                | bril_rs::Instruction::Value { dest, .. } => {
+                Instruction::Constant { dest, .. } | Instruction::Value { dest, .. } => {
                     defined_vars.insert(dest.clone());
                 }
                 _ => {}
@@ -109,8 +111,7 @@ pub fn get_facts_from_bril_fn(bril_fn: &BBFunction) -> Vec<Fact> {
         for (i, instr) in block.instrs.iter().enumerate() {
             let instr_name = block_name.clone() + "_instr_" + &i.to_string();
             let instr_defineed_vars = match instr {
-                bril_rs::Instruction::Constant { dest, .. }
-                | bril_rs::Instruction::Value { dest, .. } => {
+                Instruction::Constant { dest, .. } | Instruction::Value { dest, .. } => {
                     HashSet::from_iter(vec![dest.clone()])
                 }
                 _ => HashSet::new(),
@@ -138,4 +139,39 @@ pub fn get_facts_from_bril_fn(bril_fn: &BBFunction) -> Vec<Fact> {
     output_facts
 }
 
-fn output_bril_program(program: &BBProgram) -> () {}
+fn convert_bb_fn_to_bril_fn(bb_fn: &BBFunction) -> Function {
+    let instrs: Vec<Code> = bb_fn
+        .blocks
+        .iter()
+        .flat_map(|block| {
+            let mut instructions = Vec::new();
+            if let Some(label) = &block.label {
+                instructions.push(Code::Label {
+                    label: label.clone(),
+                    pos: None,
+                });
+            }
+            instructions.extend(block.instrs.iter().cloned().map(Code::Instruction));
+            instructions
+        })
+        .collect();
+    Function {
+        args: bb_fn.args.clone(),
+        return_type: bb_fn.return_type.clone(),
+        name: bb_fn.name.clone(),
+        pos: bb_fn.pos.clone(),
+        instrs: instrs,
+    }
+}
+
+pub fn bril_to_string(program: &BBProgram) -> String {
+    let convert_prog_back = Program {
+        functions: program
+            .func_index
+            .iter()
+            .map(convert_bb_fn_to_bril_fn)
+            .collect(),
+    };
+
+    serde_json::to_string_pretty(&convert_prog_back).unwrap()
+}

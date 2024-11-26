@@ -6,11 +6,17 @@ edition = "2021"
 [workspace]
 members = [
     ".",
-    "web-demo"
+    "web-demo/datalog_wasm"
 ]
+
+[features]
+default = ["std", "position"]
+position = []
+std = []
 
 [dependencies]
 logos = "0.13.0"
 either = "1.9.0"
-bril-rs = { git = "https://github.com/sampsyo/bril.git", branch = "main", package = "bril-rs" }
-brilirs = { git = "https://github.com/sampsyo/bril.git", branch = "main", package = "brilirs" }
+serde_json = { version = "1.0"  }
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }

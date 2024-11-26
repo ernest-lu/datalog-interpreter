@@ -1,10 +1,13 @@
+mod bril_rs;
 mod implem;
+mod optimize_bril;
 mod parse;
 mod parse_bril;
 use implem::run_datalog;
 use logos::Logos;
+use optimize_bril::perform_liveness_analysis;
 use parse::{parse_fact_vector, parse_program, DeclKind, Token};
-use parse_bril::{get_facts_from_bril_fn, parse_bril};
+use parse_bril::{bril_to_string, get_facts_from_bril_fn, parse_bril};
 use std::collections::{HashMap, HashSet};
 use std::env;
 use std::hash::Hash;
@@ -28,52 +31,11 @@ use std::hash::Hash;
 
 fn main() {
     let filname = env::args().nth(1).expect("No filename provided");
-    println!("{}", filname);
+    // println!("{}", filname);
     let src = std::fs::read_to_string(filname).expect("Error reading file");
 
-    let bril_program = parse_bril(&src).unwrap();
-    let filename = "samples/dataflow/liveness/liveness.dl";
-    let datalog_rules_src = std::fs::read_to_string(filename).expect("Error reading file");
-    let datalog_program = parse_program(&mut Token::lexer(&datalog_rules_src)).unwrap();
-    for func in &bril_program.func_index {
-        let facts = get_facts_from_bril_fn(func);
-        let output_facts = run_datalog(&datalog_program, facts).unwrap();
+    let mut bril_program = parse_bril(&src).unwrap();
+    let prog = perform_liveness_analysis(bril_program);
 
-        let facts_out = output_facts
-            .iter()
-            .filter(|f| f.name == "var_live")
-            .collect::<Vec<_>>();
-
-        let mut live_by_line: HashMap<String, HashSet<String>> = HashMap::new();
-
-        for fact in facts_out {
-            live_by_line
-                .entry(fact.params[0].clone())
-                .or_insert(HashSet::new())
-                .insert(fact.params[1].clone());
-        }
-    }
-
-    // let filename = env::args().nth(1).expect("No filename provided");
-    // let src = std::fs::read_to_string(filename).expect("Error reading file");
-    // let program = parse_program(&mut Token::lexer(&src)).unwrap();
-
-    // let input_filename = env::args().nth(2).expect("No input file provided");
-    // let src_input = std::fs::read_to_string(input_filename).expect("Error reading file");
-    // let facts = parse_fact_vector(&mut Token::lexer(&src_input)).unwrap();
-
-    // let output_decl_names: HashSet<String> = program
-    //     .decls
-    //     .iter()
-    //     .filter(|decl| decl.kind == DeclKind::Output)
-    //     .map(|decl| decl.name.clone())
-    //     .collect();
-
-    // let result = run_datalog(program, facts).unwrap();
-
-    // for fact in result {
-    //     if output_decl_names.contains(&fact.name) {
-    //         println!("{:?}", fact);
-    //     }
-    // }
+    println!("{}", bril_to_string(&prog));
 }

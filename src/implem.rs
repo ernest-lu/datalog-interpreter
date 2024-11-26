@@ -207,7 +207,7 @@ pub fn run_datalog(program: &Program, input: Vec<Fact>) -> Result<Vec<Fact>, Str
         extend_database(&mut frontier, &new_facts);
     }
 
-    println!("{:?}", facts_hashset);
+    // println!("{:?}", facts_hashset);
     Ok(facts_hashset.into_iter().collect())
 }
 mod tests {
