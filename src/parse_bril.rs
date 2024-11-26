@@ -4,7 +4,8 @@ use std::iter::successors;
 use std::{convert, vec};
 
 use crate::bril_rs::{
-    load_program_from_read, BBFunction, BBProgram, Code, EffectOps, Function, Instruction, Program,
+    load_program_from_read, BBFunction, BBProgram, BasicBlock, Code, EffectOps, Function,
+    Instruction, Program,
 };
 use crate::parse::Fact;
 
@@ -24,20 +25,39 @@ pub fn parse_bril(input: &str) -> Result<BBProgram, String> {
     }
 }
 
+fn get_block_name(block: &BasicBlock) -> String {
+    block.label.clone().unwrap_or("default_block".to_string())
+}
+
+fn get_instr_name(block_name: &str, i: usize) -> String {
+    block_name.to_string() + "_instr_" + &i.to_string()
+}
+
 fn get_instr_successors(bril_fn: &BBFunction) -> HashMap<String, Vec<String>> {
     let mut instr_successors = HashMap::new();
-    for block in &bril_fn.blocks {
-        let block_name = block.label.clone().unwrap_or("default_block".to_string());
+    let num_basic_blocks = bril_fn.blocks.len();
+
+    for (basic_block_idx, block) in bril_fn.blocks.iter().enumerate() {
+        let block_name = get_block_name(block);
         for (i, instr) in block.instrs.iter().enumerate() {
-            let instr_name = block_name.clone() + "_instr_" + &i.to_string();
+            let instr_name = get_instr_name(&block_name, i);
 
             // next instr
             if i < block.instrs.len() - 1 {
-                let next_instr_name = block_name.clone() + "_instr_" + &(i + 1).to_string();
+                let next_instr_name = get_instr_name(&block_name, i + 1);
                 instr_successors
                     .entry(instr_name.clone())
                     .or_insert(Vec::new())
                     .push(next_instr_name);
+            } else {
+                // last instr point to the next block
+                if basic_block_idx < num_basic_blocks - 1 {
+                    let next_block_name = get_block_name(&bril_fn.blocks[basic_block_idx + 1]);
+                    instr_successors
+                        .entry(instr_name.clone())
+                        .or_insert(Vec::new())
+                        .push(get_instr_name(&next_block_name, 0));
+                }
             }
 
             // successor instructions

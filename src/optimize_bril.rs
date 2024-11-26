@@ -18,15 +18,12 @@ pub fn perform_liveness_analysis(mut bril_program: BBProgram) -> BBProgram {
     let datalog_program = parse_program(&mut Token::lexer(&datalog_rules_src)).unwrap();
     for func in &mut bril_program.func_index {
         let facts = get_facts_from_bril_fn(func);
-        println!("facts: {:?}", &facts);
         let output_facts = run_datalog(&datalog_program, facts).unwrap();
 
         let facts_out = output_facts
             .iter()
             .filter(|f| f.name == "var_live")
             .collect::<Vec<_>>();
-
-        println!("facts_out: {:?}", &facts_out);
 
         let mut live_by_line: HashMap<String, HashSet<String>> = HashMap::new();
 
