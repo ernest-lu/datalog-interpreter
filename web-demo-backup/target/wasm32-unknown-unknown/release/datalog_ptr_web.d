@@ -1,1 +1,0 @@
-/Users/ernest/repo/datalog-ptr/web-demo/target/wasm32-unknown-unknown/release/datalog_ptr_web.wasm: /Users/ernest/repo/datalog-ptr/src/implem.rs /Users/ernest/repo/datalog-ptr/src/lib.rs /Users/ernest/repo/datalog-ptr/src/parse.rs /Users/ernest/repo/datalog-ptr/web-demo/src/lib.rs
