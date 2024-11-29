@@ -27,7 +27,7 @@ pub fn perform_liveness_analysis(mut bril_program: BBProgram) -> BBProgram {
 
         let mut live_by_line: HashMap<String, HashSet<String>> = HashMap::new();
 
-        // if defintition and variable is not live after the defintion, the definition can be removed
+        // if definition and variable is not live after the defintion, the definition can be removed
 
         for fact in facts_out {
             live_by_line
