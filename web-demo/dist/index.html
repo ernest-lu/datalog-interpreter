@@ -73,6 +73,8 @@
       <option value="multi_func">Multiple Functions</option>
       <option value="ackerman">Ackerman Function</option>
       <option value="small">Small Example</option>
+      <option value="small_liveness">Small Liveness Example</option>
+      <option value="liveness_example">Liveness Example</option>
     </optgroup>
     <optgroup label="General Datalog">
       <option value="ancestry">Family Relationships</option>
@@ -124,27 +126,6 @@
   ret result;
 }`
       },
-      fibonacci: {
-        code: `# Iterative fibonacci calculation
-@main(n: int) {
-  zero: int = const 0;
-  one: int = const 1;
-  i: int = const 2;
-  prev2: int = const 0;
-  prev1: int = const 1;
-.loop_header:
-  cond: bool = le i n;
-  br cond .body .done;
-.body:
-  sum: int = add prev1 prev2;
-  prev2: id prev1;
-  prev1: id sum;
-  i: int = add i one;
-  jmp .loop_header;
-.done:
-  ret prev1;
-}`
-      },
       nested_loops: {
         code: `# Nested loops example
 @main(n: int) {
@@ -168,21 +149,6 @@
   jmp .outer_loop;
 .done:
   ret i;
-}`
-      },
-      variable_reuse: {
-        code: `# Variable reuse and shadowing
-@main(n: int) {
-  x: int = const 1;
-  y: int = const 2;
-  z: int = add x y;
-  {
-    x: int = const 3;
-    y: int = const 4;
-    z: int = add x y;
-  }
-  result: int = add x z;
-  ret result;
 }`
       },
       multi_func: {
@@ -243,6 +209,33 @@
   one: int = const 1;
   y: int = add x one;
   ret y;
+}`
+      },
+      small_liveness: {
+        code: `@main {
+  a: int = const 4;
+  ret a;
+  b: int = const 5;
+  a: int = const 1;
+  c: int = const 2;
+}`
+      },
+      liveness_example: {
+        code: `# Example demonstrating variable liveness
+@main(x: int) {
+  a: int = const 1;
+  b: int = const 2;
+  c: int = add a b;
+  d: int = const 0;
+.loop:
+  cond: bool = lt d x;
+  br cond .body .done;
+.body:
+  e: int = add c d;  # c is live across the loop
+  d: int = add d a;  # a is live across the loop
+  jmp .loop;
+.done:
+  ret e;             # e is live at the end
 }`
       },
       // General Datalog Examples
@@ -349,7 +342,7 @@ friend(emma, ben);`
       if (type && analyses[type]) {
         if (type === 'factorial' || type === 'fibonacci' || type === 'nested_loops' ||
           type === 'variable_reuse' || type === 'multi_func' || type === 'ackerman' ||
-          type === 'small') {
+          type === 'small' || type === 'small_liveness' || type === 'liveness_example') {
           window.editor.setValue(analyses[type].code);
           document.getElementById('program-type').innerText = 'Bril Program';
           document.getElementById('facts-type').innerText = 'Datalog Facts';
@@ -369,12 +362,13 @@ friend(emma, ben);`
       const type = document.getElementById('analysisType').value;
       if (type === 'factorial' || type === 'fibonacci' || type === 'nested_loops' ||
         type === 'variable_reuse' || type === 'multi_func' || type === 'ackerman' ||
-        type === 'small') {
+        type === 'small' || type === 'small_liveness' || type === 'liveness_example') {
         try {
           const brilCode = window.editor.getValue();
-          console.log(brilCode);
           const result = await analyze_bril_program(brilCode);
-          window.outputEditor.setValue(result);
+          console.log(result);
+          window.factsEditor.setValue(result.first);
+          window.outputEditor.setValue(result.second);
         } catch (e) {
           window.outputEditor.setValue('Error: ' + e.toString());
         }

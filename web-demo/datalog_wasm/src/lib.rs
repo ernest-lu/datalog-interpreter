@@ -1,37 +1,80 @@
 use std::collections::HashSet;
 use std::panic;
+use std::path::Display;
 
 use bril2json::parse_abstract_program_from_read;
 use datalogint::implem::run_datalog;
 use datalogint::optimize_bril::{self, perform_liveness_analysis};
 use datalogint::parse::{parse_fact_vector, parse_program, Token};
 use datalogint::parse_bril::{
-    bril_to_string, convert_abstract_program_to_bril_program, parse_bril,
+    bril_to_string, convert_abstract_program_to_bril_program, get_facts_from_bril_fn, parse_bril,
 };
 use logos::Logos;
 use wasm_bindgen::prelude::*;
 extern crate console_error_panic_hook;
 
 #[wasm_bindgen]
-pub fn analyze_bril_program(bril_src: &str) -> Result<String, JsError> {
+#[derive(Clone)]
+pub struct StringPair {
+    inner: (String, String),
+}
+
+#[wasm_bindgen]
+impl StringPair {
+    #[wasm_bindgen(constructor)]
+    pub fn new(first: String, second: String) -> Self {
+        StringPair {
+            inner: (first, second),
+        }
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn first(&self) -> String {
+        self.inner.0.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_first(&mut self, first: String) {
+        self.inner.0 = first;
+    }
+
+    #[wasm_bindgen(getter)]
+    pub fn second(&self) -> String {
+        self.inner.1.clone()
+    }
+
+    #[wasm_bindgen(setter)]
+    pub fn set_second(&mut self, second: String) {
+        self.inner.1 = second;
+    }
+}
+
+impl std::fmt::Display for StringPair {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({}, {})", self.inner.0, self.inner.1)
+    }
+}
+
+#[wasm_bindgen]
+pub fn analyze_bril_program(bril_src: &str) -> Result<StringPair, JsError> {
     // Parse the Bril program
     let abstract_prog = parse_abstract_program_from_read(bril_src.as_bytes(), false, false, None);
 
     let bb_program = convert_abstract_program_to_bril_program(abstract_prog).unwrap();
+    let mut running_str = String::new();
+    for func in &bb_program.func_index {
+        let facts = get_facts_from_bril_fn(func);
+        running_str = format!("{}\n{}:", running_str, func.name.clone())
+            + &facts
+                .iter()
+                .fold(String::new(), |acc, fact| format!("{}\n{}", acc, fact));
+    }
 
     let opt_prog = perform_liveness_analysis(bb_program);
 
-    // Convert the abstract program to a Bril program
+    let bril_prog = bril_to_string(&opt_prog);
 
-    // let program = match parse_bril(&bril_src) {
-    //     Ok(p) => p,
-    //     Err(e) => return Err(JsError::new(&format!("Error parsing Bril: {}", e))),
-    // };
-    // let prog = perform_liveness_analysis(program);
-    // Ok(bril_to_string(&prog))
-    // let abstract_prog = parse_abstract_program_from_read(bril_src.as_bytes(), false, false, None);
-    // Ok(bril_to_string(&abstract_prog))
-    Ok(bril_to_string(&opt_prog))
+    Ok(StringPair::new(running_str.clone(), bril_prog))
 }
 
 #[wasm_bindgen]
