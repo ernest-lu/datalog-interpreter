@@ -372,6 +372,7 @@ friend(emma, ben);`
         type === 'small') {
         try {
           const brilCode = window.editor.getValue();
+          console.log(brilCode);
           const result = await analyze_bril_program(brilCode);
           window.outputEditor.setValue(result);
         } catch (e) {

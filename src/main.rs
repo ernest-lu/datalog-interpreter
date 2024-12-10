@@ -1,4 +1,4 @@
-mod bril_rs;
+mod bril_rs_personal;
 mod implem;
 mod optimize_bril;
 mod parse;

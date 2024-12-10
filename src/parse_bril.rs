@@ -3,7 +3,9 @@ use std::hash::Hash;
 use std::iter::successors;
 use std::{convert, vec};
 
-use crate::bril_rs::{
+use bril_rs::AbstractProgram;
+
+use crate::bril_rs_personal::{
     load_program_from_read, BBFunction, BBProgram, BasicBlock, Code, EffectOps, Function,
     Instruction, Program,
 };
@@ -16,6 +18,10 @@ use crate::parse::Fact;
 
 pub fn parse_bril(input: &str) -> Result<BBProgram, String> {
     let program = load_program_from_read(input.as_bytes());
+    program_to_bbprogram(program)
+}
+
+pub fn program_to_bbprogram(program: Program) -> Result<BBProgram, String> {
     match program.try_into() {
         Ok(p) => Ok(p),
         Err(e) => Err(format!(
@@ -157,6 +163,21 @@ pub fn get_facts_from_bril_fn(bril_fn: &BBFunction) -> Vec<Fact> {
         }
     }
     output_facts
+}
+
+pub fn convert_abstract_program_to_bril_program(
+    program: AbstractProgram,
+) -> Result<BBProgram, String> {
+    let p = match Program::try_from(program) {
+        Ok(p) => p,
+        Err(e) => {
+            return Err(format!(
+                "Error converting abstract program to bril program: {}",
+                e
+            ))
+        }
+    };
+    program_to_bbprogram(p)
 }
 
 fn convert_bb_fn_to_bril_fn(bb_fn: &BBFunction) -> Function {

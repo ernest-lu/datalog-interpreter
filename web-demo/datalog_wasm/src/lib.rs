@@ -1,23 +1,37 @@
 use std::collections::HashSet;
+use std::panic;
 
-use datalogint::bril_rs::BBProgram;
+use bril2json::parse_abstract_program_from_read;
 use datalogint::implem::run_datalog;
-use datalogint::optimize_bril::perform_liveness_analysis;
+use datalogint::optimize_bril::{self, perform_liveness_analysis};
 use datalogint::parse::{parse_fact_vector, parse_program, Token};
-use datalogint::parse_bril::{bril_to_string, parse_bril};
+use datalogint::parse_bril::{
+    bril_to_string, convert_abstract_program_to_bril_program, parse_bril,
+};
 use logos::Logos;
 use wasm_bindgen::prelude::*;
+extern crate console_error_panic_hook;
 
 #[wasm_bindgen]
 pub fn analyze_bril_program(bril_src: &str) -> Result<String, JsError> {
     // Parse the Bril program
-    // let bril_json = bril2json(bril_src);
-    let program = match parse_bril(&bril_src) {
-        Ok(p) => p,
-        Err(e) => return Err(JsError::new(&format!("Error parsing Bril: {}", e))),
-    };
-    let prog = perform_liveness_analysis(program);
-    Ok(bril_to_string(&prog))
+    let abstract_prog = parse_abstract_program_from_read(bril_src.as_bytes(), false, false, None);
+
+    let bb_program = convert_abstract_program_to_bril_program(abstract_prog).unwrap();
+
+    let opt_prog = perform_liveness_analysis(bb_program);
+
+    // Convert the abstract program to a Bril program
+
+    // let program = match parse_bril(&bril_src) {
+    //     Ok(p) => p,
+    //     Err(e) => return Err(JsError::new(&format!("Error parsing Bril: {}", e))),
+    // };
+    // let prog = perform_liveness_analysis(program);
+    // Ok(bril_to_string(&prog))
+    // let abstract_prog = parse_abstract_program_from_read(bril_src.as_bytes(), false, false, None);
+    // Ok(bril_to_string(&abstract_prog))
+    Ok(bril_to_string(&opt_prog))
 }
 
 #[wasm_bindgen]
@@ -65,6 +79,7 @@ pub fn run_datalog_analysis(rules: &str, facts: &str) -> Result<String, JsError>
 
 #[wasm_bindgen(start)]
 pub fn main() -> Result<(), JsValue> {
+    panic::set_hook(Box::new(console_error_panic_hook::hook));
     Ok(())
 }
 
@@ -83,5 +98,38 @@ mod tests {
         "#;
         let result = crate::analyze_bril_program(bril_src);
         assert!(result.is_ok());
+        println!("Result: {}", &result.unwrap());
+    }
+
+    #[test]
+    fn test_analyze_bril_program_2() {
+        let bril_src = r#"
+        # Nested loops example
+        @main(n: int) {
+            zero: int = const 0;
+            one: int = const 1;
+            i: int = const 0;
+        .outer_loop:
+            cond1: bool = lt i n;
+            br cond1 .outer_body .done;
+        .outer_body:
+            j: int = const 0;
+        .inner_loop:
+            cond2: bool = lt j n;
+            br cond2 .inner_body .outer_next;
+        .inner_body:
+            sum: int = add i j;
+            j: int = add j one;
+            jmp .inner_loop;
+        .outer_next:
+            i: int = add i one;
+            jmp .outer_loop;
+        .done:
+            ret i;
+        }
+        "#;
+        let result = crate::analyze_bril_program(bril_src);
+        assert!(result.is_ok());
+        println!("Result: {}", &result.unwrap());
     }
 }
